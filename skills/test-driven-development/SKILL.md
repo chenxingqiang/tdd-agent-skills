@@ -229,7 +229,9 @@ Preference order (most to least preferred):
 4. Mock (interaction)   → Verifies method calls — use sparingly
 ```
 
-**Use mocks only when:** the real implementation is too slow, non-deterministic, or has side effects you can't control (external APIs, email sending). Over-mocking creates tests that pass while production breaks.
+**Core logic must never be tested against mocks or stubs.** Any logic that represents a business rule, domain behavior, or critical path must be tested against its real implementation. Mocking core logic produces tests that pass while production breaks — this is worse than no test at all.
+
+**Use mocks only when:** the dependency is external to the system boundary (third-party APIs, email/SMS providers, payment gateways) and is genuinely impossible to run locally. Over-mocking creates tests that pass while production breaks.
 
 ### Use the Arrange-Act-Assert Pattern
 
@@ -377,3 +379,5 @@ After completing any implementation:
 - [ ] Test names describe the behavior being verified
 - [ ] No tests were skipped or disabled
 - [ ] Coverage hasn't decreased (if tracked)
+- [ ] No core logic is tested exclusively via mocks — real implementations are used
+- [ ] Validation is performed in the actual target environment (or a strictly identical one), not a simulated environment

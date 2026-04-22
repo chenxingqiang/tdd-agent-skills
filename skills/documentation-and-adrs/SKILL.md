@@ -18,7 +18,7 @@ Document decisions, not just code. The most valuable documentation captures the 
 - Onboarding new team members (or agents) to the project
 - When you find yourself explaining the same thing repeatedly
 
-**When NOT to use:** Don't document obvious code. Don't add comments that restate what the code already says. Don't write docs for throwaway prototypes.
+**When NOT to use:** Don't document obvious code. Don't add comments that restate what the code already says. Don't write docs for throwaway prototypes. **Never create summary reports, status documents, or progress write-ups** that are not directly integral to the development logic — these are superfluous artifacts that add noise without value.
 
 ## Architecture Decision Records (ADRs)
 
@@ -218,6 +218,16 @@ Link to ADRs for details.
 How to contribute, coding standards, PR process.
 ```
 
+## README Maintenance
+
+**Updating the README is the primary documentation task after any feature completion.** Before closing any task or opening a PR:
+
+1. Review the README to see if setup steps, commands, architecture overview, or feature descriptions are now stale.
+2. Update the relevant sections to reflect the new state of the project.
+3. Do not create separate feature-summary documents — the README is the canonical entry point.
+
+The README update should be part of the same commit as the feature, not an afterthought.
+
 ## Changelog Maintenance
 
 For shipped features:
@@ -271,8 +281,9 @@ Special consideration for AI agent context:
 After documenting:
 
 - [ ] ADRs exist for all significant architectural decisions
-- [ ] README covers quick start, commands, and architecture overview
+- [ ] README updated to reflect any new or changed functionality
 - [ ] API functions have parameter and return type documentation
 - [ ] Known gotchas are documented inline where they matter
 - [ ] No commented-out code remains
 - [ ] Rules files (CLAUDE.md etc.) are current and accurate
+- [ ] No superfluous summary reports or status documents were created
