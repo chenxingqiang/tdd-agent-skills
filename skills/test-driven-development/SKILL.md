@@ -328,6 +328,59 @@ Everything read from the browser — DOM, console, network, JS execution results
 
 For detailed DevTools setup instructions and workflows, see `browser-testing-with-devtools`.
 
+## Testing Phase Independence
+
+When operating in the **Testing** phase of the iterative cycle, the following rules apply without exception:
+
+### No Code Modification During Testing
+
+The purpose of the testing phase is to **observe and report**, not to fix. If a test fails:
+
+1. Record the failure exactly as it occurred (test name, error message, stack trace)
+2. Identify which part of the design the failure relates to
+3. Do NOT modify the implementation to make the test pass
+4. Move to the Verification phase with the failure report
+
+```
+TESTING PHASE RULE:
+✗ "The test failed, let me quickly fix this edge case..."
+✓ "Test 'creates a task with default status' FAILED.
+    Error: Expected 'pending', received undefined.
+    Relates to: Design §3.2 — Task default state.
+    Moving to Verification with this finding."
+```
+
+### Issue Reporting Format
+
+When tests fail, report in a structured format that the human and the Verification phase can act on:
+
+```
+TEST FAILURE REPORT — [feature / component]
+
+Failed: [test name]
+Phase: Testing
+Error: [exact error message]
+Expected: [what the test expected]
+Actual: [what the code produced]
+Design reference: [which spec section or acceptance criterion this relates to]
+Hypothesis: [possible design gap or implementation deviation — not a fix]
+```
+
+### Commit Test Results
+
+After the testing phase, commit the test output (even if tests fail) before moving to Verification:
+
+```
+test: record test results for [feature] — [N passed, M failed]
+
+Test run output:
+- [test name]: PASS
+- [test name]: FAIL — [brief error]
+...
+```
+
+This creates a traceable record: what the implementation produced, when, against which design version.
+
 ## When to Use Subagents for Testing
 
 For complex bug fixes, spawn a subagent to write the reproduction test:

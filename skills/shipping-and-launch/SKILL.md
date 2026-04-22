@@ -17,6 +17,109 @@ Ship with confidence. The goal is not just to deploy — it's to deploy safely, 
 - Opening a beta or early access program
 - Any deployment that carries risk (all of them)
 
+## Production Acceptance Declaration
+
+Before merging any change intended for production, Claude MUST:
+
+1. Declare completion of the Production-Readiness Checklist (below)
+2. Summarize key findings, noting any deviations or justified exceptions
+3. Request explicit human approval before proceeding to production deployment
+
+```
+PRODUCTION ACCEPTANCE DECLARATION
+
+Feature: [name]
+Checklist: [all 13 items — status for each]
+
+Deviations / Exceptions:
+- [item N]: [justification for why this item was waived or deferred]
+
+Key findings:
+- [any risk, known limitation, or post-launch monitoring requirement]
+
+Request: Human approval to proceed to production deployment.
+```
+
+## Production-Readiness Checklist
+
+Complete all 13 items before any merge to `main` or production deploy. Record results and human approvals.
+
+### 1. Acceptance Criteria & Metrics
+- [ ] SLOs/SLAs defined (latency, availability, error budget)
+- [ ] Success verification steps documented (how to confirm the feature works in production)
+- [ ] Performance targets measured and within budget
+
+### 2. API & Contract
+- [ ] Request/response schemas documented with types
+- [ ] Versioning strategy defined
+- [ ] Backward-compatibility strategy confirmed
+
+### 3. Failure & Recovery
+- [ ] Error classes and their status codes defined
+- [ ] Retry/backoff strategy documented
+- [ ] Idempotency requirements addressed
+- [ ] Graceful degradation behavior under dependency failure documented
+
+### 4. Observability
+- [ ] Key metrics defined (counters, histograms, gauges)
+- [ ] Structured log fields documented
+- [ ] Tracing spans in place
+- [ ] Dashboards and alert thresholds configured
+
+### 5. Test Coverage
+- [ ] Unit tests exist and pass
+- [ ] Integration tests exist and pass
+- [ ] End-to-end tests cover critical flows
+- [ ] Regression tests guard previous bug fixes
+- [ ] Performance and/or security tests exist where applicable
+
+### 6. CI/CD & Release Plan
+- [ ] Pipeline passes (all stages green)
+- [ ] Artifact provenance confirmed
+- [ ] Canary/rollout strategy documented
+- [ ] Rollback procedure documented and tested
+
+### 7. Resource & Cost
+- [ ] Resource usage estimated (CPU, memory, storage, DB connections)
+- [ ] Limits/quotas set
+- [ ] Cost-sensitive operations identified
+
+### 8. Security & Compliance
+- [ ] Dependency license check complete
+- [ ] Threat model reviewed
+- [ ] Security scans run (`npm audit` or equivalent shows no critical/high)
+- [ ] Auth/authz checks in place
+- [ ] Input validation on all user-facing endpoints
+
+### 9. Data & Schema Migrations
+- [ ] Migration is backward-compatible (or rollback window is defined)
+- [ ] Rollback migration exists and is tested
+- [ ] Data integrity confirmed after migration
+
+### 10. Runbook & Ownership
+- [ ] Runbook covers: how to detect this is broken, key dashboards, rollback steps, escalation
+- [ ] Owner(s) designated for the feature
+- [ ] On-call scope updated if applicable
+
+### 11. Feature Controls
+- [ ] Feature flag or configuration toggle exists for fast disable
+- [ ] Both flag states (on/off) tested in CI
+- [ ] Flag expiration date and owner assigned
+
+### 12. Post-Deploy Verification
+- [ ] Immediate post-deploy smoke tests defined
+- [ ] SLO verification steps documented
+- [ ] Monitoring window (first hour) plan in place
+
+### 13. Documentation & Changelog
+- [ ] User-facing and developer docs updated
+- [ ] Changelog entry present
+- [ ] ADRs written for architectural decisions
+
+---
+
+*Previous sections below are preserved as domain-specific guidance for each checklist area.*
+
 ## The Pre-Launch Checklist
 
 ### Code Quality
