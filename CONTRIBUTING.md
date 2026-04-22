@@ -1,6 +1,6 @@
-# Contributing to Agent Skills
+# Contributing to TDD Agent Skills
 
-Thanks for your interest in contributing! This project is a collection of production-grade engineering skills for AI coding agents.
+Thanks for your interest in contributing! This project is a collection of production-grade Test-Driven Development skills for AI coding agents.
 
 ## Adding a New Skill
 

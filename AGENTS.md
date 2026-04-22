@@ -4,7 +4,9 @@ This file provides guidance to AI coding agents (Claude Code, Cursor, Copilot, A
 
 ## Repository Overview
 
-A collection of skills for Claude.ai and Claude Code for senior software engineers. Skills are packaged instructions and scripts that extend Claude and your coding agents capabilities.
+A collection of TDD-first skills for Claude.ai and Claude Code for senior software engineers. Skills are packaged instructions and scripts that enforce Test-Driven Development workflows and extend AI coding agent capabilities.
+
+**Author:** Chen Xingqiang | **Repository:** chenxingqiang/tdd-agent-skills
 
 ## OpenCode Integration
 

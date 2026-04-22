@@ -1,17 +1,41 @@
-# Agent Skills
+# TDD Agent Skills
 
-**Production-grade engineering skills for AI coding agents.**
+**Production-grade Test-Driven Development skills for AI coding agents.**
 
-Skills encode the workflows, quality gates, and best practices that senior engineers use when building software. These ones are packaged so AI agents follow them consistently across every phase of development.
+> **Author:** Chen Xingqiang  
+> **Repository:** [chenxingqiang/tdd-agent-skills](https://github.com/chenxingqiang/tdd-agent-skills)
+
+TDD Agent Skills encodes Test-Driven Development workflows, quality gates, and best practices that senior engineers use when building software. Skills are packaged so AI agents follow TDD discipline consistently across every phase of development — write tests first, then code, then verify.
 
 ```
   DEFINE          PLAN           BUILD          VERIFY         REVIEW          SHIP
  ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐      ┌──────┐
- │ Idea │ ───▶ │ Spec │ ───▶ │ Code │ ───▶ │ Test │ ───▶ │  QA  │ ───▶ │  Go  │
- │Refine│      │  PRD │      │ Impl │      │Debug │      │ Gate │      │ Live │
+ │ Idea │ ───▶ │ Spec │ ───▶ │ Test │ ───▶ │ Code │ ───▶ │  QA  │ ───▶ │  Go  │
+ │Refine│      │  PRD │      │First │      │ Impl │      │ Gate │      │ Live │
  └──────┘      └──────┘      └──────┘      └──────┘      └──────┘      └──────┘
-  /spec          /plan          /build        /test         /review       /ship
+  /spec          /plan          /test         /build        /review       /ship
 ```
+
+---
+
+## Core TDD Principles
+
+This project is governed by the following principles — all development artifacts, agent behaviors, and skill workflows must adhere to them:
+
+1. **Test-Driven Development (TDD):** Write tests first, then code. This ensures requirements are clear and the code is verifiable.
+2. **Phased Development:** The process is strictly divided into Design, Development, Testing, and Verification phases. Each phase has clear objectives to prevent uncontrolled changes.
+3. **Design-First Precision:** The initial design must be detailed and precise. Decisions made in the Design phase should not be arbitrarily altered in later phases. Any changes require explicit justification and human confirmation.
+4. **Minimal Change Principle:** Modifications during the Verification phase must be minimal and targeted, focusing solely on addressing specific issues identified by tests, not on large-scale refactoring.
+5. **Production-Targeted Development:**
+   - **English-Only & Professionalism:** All development artifacts (code, comments, documentation, commit messages) must be written in clear, professional English.
+   - **No Mocking/Simulation:** Development must be conducted against real components and systems. The use of mocks, stubs, or simulated environments for core logic is prohibited.
+   - **Production-Ready Focus:** Every artifact must be designed and implemented to be concise, maintainable, and directly deployable to a production environment.
+6. **Real-Environment Validation:** All validation must be performed in the actual target system or a strictly identical environment.
+7. **Minimize File Creation:** The default action should be to modify and extend existing code files. Creating new files should be a last resort, only when the existing codebase lacks a logically coherent place for the new functionality.
+8. **Lean Documentation:** No superfluous reports. The primary documentation task after any feature completion is to update the project's `README.md`.
+9. **Pre-Modification Review:** Before any change, a comprehensive review of existing materials must be performed. Changes must be minimal, necessary, and applied to existing artifacts.
+10. **Human Approval Gate:** All critical decisions and modifications require review and approval by the human programmer.
+11. **Collaborative Iteration:** Work closely through iterative cycles of Design → Development → Testing → Verification → Refinement.
 
 ---
 
@@ -41,8 +65,8 @@ Skills also activate automatically based on what you're doing — designing an A
 **Marketplace install:**
 
 ```
-/plugin marketplace add addyosmani/agent-skills
-/plugin install agent-skills@addy-agent-skills
+/plugin marketplace add chenxingqiang/tdd-agent-skills
+/plugin install tdd-agent-skills@chen-tdd-agent-skills
 ```
 
 > **SSH errors?** The marketplace clones repos via SSH. If you don't have SSH keys set up on GitHub, either [add your SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) or switch to HTTPS for fetches only:
@@ -53,8 +77,8 @@ Skills also activate automatically based on what you're doing — designing an A
 **Local / development:**
 
 ```bash
-git clone https://github.com/addyosmani/agent-skills.git
-claude --plugin-dir /path/to/agent-skills
+git clone https://github.com/chenxingqiang/tdd-agent-skills.git
+claude --plugin-dir /path/to/tdd-agent-skills
 ```
 
 </details>
@@ -74,13 +98,13 @@ Install as native skills for auto-discovery, or add to `GEMINI.md` for persisten
 **Install from the repo:**
 
 ```bash
-gemini skills install https://github.com/addyosmani/agent-skills.git --path skills
+gemini skills install https://github.com/chenxingqiang/tdd-agent-skills.git --path skills
 ```
 
 **Install from a local clone:**
 
 ```bash
-gemini skills install ./agent-skills/skills/
+gemini skills install ./tdd-agent-skills/skills/
 ```
 
 </details>
@@ -239,7 +263,7 @@ Every skill follows a consistent anatomy:
 ## Project Structure
 
 ```
-agent-skills/
+tdd-agent-skills/
 ├── skills/                            # 20 core skills (SKILL.md per directory)
 │   ├── idea-refine/                   #   Define
 │   ├── spec-driven-development/       #   Define
@@ -248,7 +272,7 @@ agent-skills/
 │   ├── context-engineering/           #   Build
 │   ├── source-driven-development/     #   Build
 │   ├── frontend-ui-engineering/       #   Build
-│   ├── test-driven-development/       #   Build
+│   ├── test-driven-development/       #   Build (Primary TDD skill)
 │   ├── api-and-interface-design/      #   Build
 │   ├── browser-testing-with-devtools/ #   Verify
 │   ├── debugging-and-error-recovery/  #   Verify
@@ -271,11 +295,18 @@ agent-skills/
 
 ---
 
-## Why Agent Skills?
+## Why TDD Agent Skills?
 
-AI coding agents default to the shortest path - which often means skipping specs, tests, security reviews, and the practices that make software reliable. Agent Skills gives agents structured workflows that enforce the same discipline senior engineers bring to production code.
+AI coding agents default to the shortest path — which often means skipping tests, specs, security reviews, and the practices that make software reliable. TDD Agent Skills gives agents structured, test-first workflows that enforce the same discipline senior engineers bring to production code.
 
-Each skill encodes hard-won engineering judgment: *when* to write a spec, *what* to test, *how* to review, and *when* to ship. These aren't generic prompts - they're the kind of opinionated, process-driven workflows that separate production-quality work from prototype-quality work.
+The TDD-first approach means:
+- **Tests define behavior** before implementation begins
+- **Red-Green-Refactor** is the mandatory cycle for every code change
+- **No skipping verification** — "seems right" is never sufficient
+- **Real environments only** — no mocks for core logic
+- **Minimal, targeted changes** — especially during verification and bug fixes
+
+Each skill encodes hard-won engineering judgment: *when* to write a spec, *what* to test, *how* to review, and *when* to ship. These aren't generic prompts — they're the kind of opinionated, process-driven workflows that separate production-quality work from prototype-quality work.
 
 Skills bake in best practices from Google's engineering culture — including concepts from [Software Engineering at Google](https://abseil.io/resources/swe-book) and Google's [engineering practices guide](https://google.github.io/eng-practices/). You'll find Hyrum's Law in API design, the Beyonce Rule and test pyramid in testing, change sizing and review speed norms in code review, Chesterton's Fence in simplification, trunk-based development in git workflow, Shift Left and feature flags in CI/CD, and a dedicated deprecation skill treating code as a liability. These aren't abstract principles — they're embedded directly into the step-by-step workflows agents follow.
 
@@ -292,3 +323,9 @@ See [docs/skill-anatomy.md](docs/skill-anatomy.md) for the format specification 
 ## License
 
 MIT - use these skills in your projects, teams, and tools.
+
+---
+
+## Author
+
+**Chen Xingqiang** — [chenxingqiang](https://github.com/chenxingqiang)

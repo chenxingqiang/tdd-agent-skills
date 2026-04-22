@@ -1,6 +1,6 @@
 # OpenCode Setup
 
-This guide explains how to use Agent Skills with OpenCode in a way that closely mirrors the Claude Code experience (automatic skill selection, lifecycle-driven workflows, and strict process enforcement).
+This guide explains how to use TDD Agent Skills with OpenCode in a way that closely mirrors the Claude Code experience (automatic skill selection, lifecycle-driven workflows, and strict process enforcement).
 
 ## Overview
 
@@ -29,7 +29,7 @@ This more closely matches how Claude Code behaves in practice, where skills are 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/addyosmani/agent-skills.git
+git clone https://github.com/chenxingqiang/tdd-agent-skills.git
 ```
 
 2. Open the project in OpenCode.
@@ -175,4 +175,4 @@ OpenCode integration works by combining:
 - Strong agent rules (`AGENTS.md`)
 - Automatic skill invocation via reasoning
 
-This results in a **fully agent-driven, production-grade engineering workflow** without requiring plugins or manual commands.
+This results in a **fully agent-driven, production-grade TDD engineering workflow** without requiring plugins or manual commands.
