@@ -88,11 +88,36 @@ If Slice 1 fails, you discover it before investing in Slices 2 and 3.
 
 ## Implementation Rules
 
-### Rule 0: Simplicity First
+### Rule -1: Design Adherence
 
-Before writing any code, ask: "What is the simplest thing that could work?"
+Before writing a single line of code, confirm the approved design exists and implement **strictly** according to it.
 
-After writing code, review it against these checks:
+**No deviations are allowed without explicit human approval.** If the implementation reveals a gap or contradiction in the approved design, stop and raise it:
+
+```
+[DEVELOPMENT — BLOCKER] The approved design specifies X, but the existing code
+enforces Y, making X impossible without modifying [module]. I am not proceeding.
+Please advise.
+```
+
+After completing implementation, request human sign-off before advancing to Testing:
+
+```
+[DEVELOPMENT] The development based on the approved design document for [feature]
+is done and includes the unit tests. Please review and give sign-off.
+The source code and tests are here: [link/details].
+```
+
+### Rule 0: Simplicity First and Pre-Modification Review
+
+Before writing any code, perform two checks:
+
+**Pre-Modification Review:**
+1. Does the intended code already exist? (Avoid duplication — search first.)
+2. Can an existing file be modified instead of creating a new one?
+3. Am I applying the Minimal Change Principle — changing only what is strictly necessary?
+
+**Simplicity Check:**
 - Can this be done in fewer lines?
 - Are these abstractions earning their complexity?
 - Would a staff engineer look at this and say "why didn't you just..."?
@@ -255,6 +280,8 @@ After each increment, verify:
 - Building abstractions before the third use case demands it
 - Touching files outside the task scope "while I'm here"
 - Creating new utility files for one-time operations
+- Deviating from the approved design without human approval
+- Implementing without an approved design
 
 ## Verification
 
@@ -265,3 +292,6 @@ After completing all increments for a task:
 - [ ] The build is clean
 - [ ] The feature works end-to-end as specified
 - [ ] No uncommitted changes remain
+- [ ] Pre-Modification Review was performed before each increment
+- [ ] No deviations from the approved design were introduced without human approval
+- [ ] Human sign-off was obtained before advancing to Testing

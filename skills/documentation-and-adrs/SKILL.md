@@ -249,7 +249,11 @@ For shipped features:
 
 ## Core Logic Change Logging
 
-Any change to important project experience, architectural decisions, or core business logic must be explicitly recorded in the `.cursorrules` file (or the project's designated decision log, e.g., `CLAUDE.md` or `docs/decisions/changes.md`).
+Any change to important project experience, architectural decisions, or core business logic **must** be explicitly recorded in the `.cursorrules` file, which serves as the canonical, agent-readable log of decisions that shape how the codebase is built and maintained.
+
+Additionally record in secondary locations as appropriate:
+- `CLAUDE.md` — for agent-facing project conventions and behavior rules
+- `docs/decisions/changes.md` — supplementary append-only log for architectural changes
 
 ### When to Create a Log Entry
 
@@ -315,11 +319,11 @@ ULID provides the same uniqueness guarantees while being sortable by creation ti
 
 ### Placement
 
-- **`.cursorrules`** — for changes to agent behavior rules and AI-specific conventions
-- **`CLAUDE.md`** — for agent-facing project conventions
-- **`docs/decisions/changes.md`** — for architectural and business logic changes (append-only log)
+- **`.cursorrules`** — **Required primary location** for all core logic changes, architectural decisions, and AI-behavior conventions. Every qualifying change must appear here.
+- **`CLAUDE.md`** — for agent-facing project conventions (secondary)
+- **`docs/decisions/changes.md`** — for architectural and business logic changes (secondary, append-only log)
 
-When in doubt, record in all applicable locations. The goal is traceability: a future engineer or agent reading the codebase six months later should be able to find exactly why a core decision was made and by whom.
+Record in all applicable locations. The goal is traceability: a future engineer or agent reading the codebase six months later should be able to find exactly why a core decision was made and by whom. The `.cursorrules` file is always the first place to check.
 
 ## Documentation for Agents
 

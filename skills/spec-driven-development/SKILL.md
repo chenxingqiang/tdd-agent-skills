@@ -35,6 +35,19 @@ SPECIFY ──→ PLAN ──→ TASKS ──→ IMPLEMENT
 
 Start with a high-level vision. Ask the human clarifying questions until requirements are concrete.
 
+**Declare the phase first:**
+
+```
+[DESIGN] I am clarifying the requirements for [feature]. Can you provide more details on [specific aspect]?
+```
+
+**Pre-Modification Review.** Before creating or modifying any spec document, test outline, or design artifact:
+
+- Review existing approved content to confirm the intended content does not already exist (avoid duplication)
+- If a related artifact already exists, modify it rather than creating a new one — unless the human explicitly approves a new artifact
+- Apply the **Minimal Change Principle**: change only what is strictly necessary to meet the new requirement
+- Document the rationale for any modification and reference the original artifact being changed
+
 **Surface assumptions immediately.** Before writing any spec content, list what you're assuming:
 
 ```
@@ -128,6 +141,19 @@ REFRAMED SUCCESS CRITERIA:
 
 This lets you loop, retry, and problem-solve toward a clear goal rather than guessing what "faster" means.
 
+**Human Approval.** Design must be approved by the human programmer before proceeding to Phase 2. Present the spec with:
+
+```
+[DESIGN] I have completed the design for [feature]. Please review and approve.
+Here is the detailed design document: [link/details].
+```
+
+Do not proceed until explicit human approval is received. Then commit the design documentation and the draft test cases:
+
+```
+docs: design and test plan for [feature] — approved
+```
+
 ### Phase 2: Plan
 
 With the validated spec, generate a technical implementation plan:
@@ -177,31 +203,46 @@ Design ──→ Development ──→ Testing ──→ Verification
 ```
 
 - **Development:** Implement against the approved spec. No scope deviation without human approval.
-- **Testing:** Execute tests against the implementation. Do not modify code during the testing phase — only report results and identify deviations.
-- **Verification:** Evaluate test results. Suggest *minimal* design changes supported by concrete test evidence. Obtain human approval before applying changes.
+- **Testing:** Execute tests against the implementation. Do not modify code during the testing phase — only report results and identify deviations. Commit the test results (pass or fail) before moving to Verification.
+- **Verification:** Evaluate test results. Suggest *minimal* design changes supported by concrete test evidence. Obtain human approval before applying changes. Commit the approved design modifications.
 - **Refinement:** Apply approved design changes, then restart Development → Testing → Verification. Each cycle gets its own commit.
 
 **Evidence-Based Modifications:** Any proposed design change during Verification must cite the specific failing test(s), the exact deviation from the expected behavior, and the smallest adjustment that would correct it. Never suggest broad rewrites based on a single test failure.
 
 ## Phase Communication Protocol
 
-Declare the current phase at the start of each interaction. This prevents scope confusion and ensures the human always knows what kind of response is appropriate.
+Declare the current phase at the start of **every** interaction. This prevents scope confusion and ensures the human always knows what kind of response is appropriate.
 
-**Phase declarations:**
+**Phase declarations (use exactly these formats):**
 
 ```
-"[DESIGN] I am clarifying requirements for [feature]. Can you confirm [specific assumption]?"
+"[DESIGN] I am in the Design phase. I am clarifying the requirements for [feature].
+ Can you provide more details on [specific aspect]?"
 
-"[DEVELOPMENT] Implementing [feature] per the approved spec. Scope: [files]. Proceeding."
+"[DESIGN] I have completed the design for [feature]. Please review and approve.
+ Here is the detailed design document: [link/details]."
 
-"[TESTING] Running tests for [feature]. No code changes will be made in this phase."
+"[DEVELOPMENT] I am in the Development phase. I am implementing the code based on
+ the approved design document. Is there any clarification required?"
 
-"[VERIFICATION] Tests complete. [N] passed, [M] failed. I have a minimal design change
- suggestion for [specific area]. Here is the evidence: [test output]. Rationale: [reason].
- Request approval before proceeding."
+"[DEVELOPMENT] The development based on the approved design document for [feature]
+ is done and includes the unit tests. Please review and give sign-off.
+ The source code and tests are here: [link/details]."
+
+"[TESTING] I am in the Testing phase. I am running the unit tests for [feature]."
+
+"[TESTING] The test failed for [test name]. Here is the error description: [details].
+ This might relate to [potential part of design]."
+
+"[VERIFICATION] I am in the Verification phase. After testing, I noticed that the
+ design needs to be changed slightly in [specific area]. Here is the suggestion:
+ [details] and rationale: [details]."
+
+"[VERIFICATION] Here is the modified design suggestion for [feature]. Please approve
+ to proceed. The modification is [details], based on test results."
 ```
 
-**Feedback gate:** Whenever human action is required before proceeding, Claude MUST state:
+**Feedback gate:** Whenever human action is required before proceeding, MUST state:
 1. What decision or input is needed
 2. Why it is needed
 3. What will happen next once the human responds
@@ -316,16 +357,20 @@ The spec is a living document, not a one-time artifact:
 - Implementing features not mentioned in any spec or task list
 - Making architectural decisions without documenting them
 - Skipping the spec because "it's obvious what to build"
+- Creating a new spec artifact when a relevant one already exists (Pre-Modification Review violation)
+- Advancing to Development without explicit human approval of the design
 
 ## Verification
 
 Before proceeding to implementation, confirm:
 
+- [ ] Pre-Modification Review performed (no duplicate spec artifacts created)
 - [ ] The spec covers all six core areas
-- [ ] The human has reviewed and approved the spec
+- [ ] The human has reviewed and **explicitly approved** the spec
 - [ ] Success criteria are specific and testable
 - [ ] Boundaries (Always/Ask First/Never) are defined
 - [ ] The spec is saved to a file in the repository
+- [ ] Design documentation and test case outlines are committed after approval
 - [ ] Production-Readiness section is present or each item is explicitly waived with human approval
 - [ ] Design evaluated against Production-Grade Elegance criteria
 - [ ] Phase Communication Protocol in use (phase declared at start of each interaction)
