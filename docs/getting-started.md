@@ -2,6 +2,41 @@
 
 tdd-agent-skills works with any AI coding agent that accepts Markdown instructions. This guide covers the universal approach. For tool-specific setup, see the dedicated guides.
 
+## TDD Development Protocol Workflow
+
+All agents using this skill set — regardless of tool — follow the same four-phase development protocol. This section describes the universal workflow and the rules that apply in every phase.
+
+### The Four Phases
+
+```
+DESIGN ──▶ DEVELOPMENT ──▶ TESTING ──▶ VERIFICATION
+   ▲                            │            │
+   └────────────────────────────┘            │  (approved design change)
+   ▲                                         │
+   └─────────────────────────────────────────┘  (cycle repeats)
+```
+
+| Phase | Skill | What the agent does |
+|-------|-------|---------------------|
+| **Design** | `spec-driven-development` | Clarifies requirements, generates a detailed design including production-readiness sections, drafts test-case outlines, commits the design doc. Waits for human approval before proceeding. |
+| **Development** | `incremental-implementation` + `test-driven-development` | Implements code and executable unit tests strictly per the approved design. No scope deviation without human sign-off. Commits code + tests after human sign-off. |
+| **Testing** | `test-driven-development` | Runs tests. Reports results in structured format (test name, expected, actual, design reference). **Makes no code changes.** Commits test results. |
+| **Verification** | `spec-driven-development` | Reviews test failures. Suggests the *minimal* design change supported by evidence. Obtains human approval, then re-enters Development with the updated design. |
+
+### Universal Rules for All Agents
+
+Regardless of tool, every agent MUST:
+
+1. **Declare the current phase** at the start of each interaction: `[DESIGN]`, `[DEVELOPMENT]`, `[TESTING]`, or `[VERIFICATION]`.
+2. **Stop and ask** before advancing to the next phase. Never assume approval.
+3. **Never modify code during Testing.** Record and report only.
+4. **Apply Minimal Change Principle** before modifying any artifact — check whether the content already exists, and change only what is strictly necessary.
+5. **Back all design changes with evidence** — cite the specific failing test and smallest fix.
+6. **Commit after each phase** — design docs, then code, then test results, then refined design.
+7. **Issue a Production Acceptance Declaration** before any merge to `main` — complete the 13-item checklist in `shipping-and-launch` and get human sign-off.
+
+See `AGENTS.md` (in the repository root) for the authoritative rule set that applies to all agents.
+
 ## How Skills Work
 
 Each skill is a Markdown file (`SKILL.md`) that describes a specific engineering workflow. When loaded into an agent's context, the agent follows the workflow — including verification steps, anti-patterns to avoid, and exit criteria.

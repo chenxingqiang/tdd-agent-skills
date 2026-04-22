@@ -4,9 +4,61 @@ This file provides guidance to AI coding agents (Claude Code, Cursor, Copilot, A
 
 ## Repository Overview
 
-A collection of TDD-first skills for Claude.ai and Claude Code for senior software engineers. Skills are packaged instructions and scripts that enforce Test-Driven Development workflows and extend AI coding agent capabilities.
+A collection of TDD-first skills for **all AI coding agents** — Claude Code, Cursor, GitHub Copilot, Gemini CLI, Windsurf, OpenCode, Kiro, and any agent that accepts Markdown instructions. Skills enforce the TDD Development Protocol: a phased Design → Development → Testing → Verification workflow with human-approval gates, phase communication contracts, and production-readiness requirements.
 
 **Author:** Chen Xingqiang | **Repository:** chenxingqiang/tdd-agent-skills
+
+---
+
+## TDD Development Protocol
+
+These rules apply to **every agent** using this skill set, regardless of tool. The protocol divides development into four gated phases. Each phase has specific objectives and non-negotiable rules.
+
+### Four Phases
+
+```
+DESIGN ──▶ DEVELOPMENT ──▶ TESTING ──▶ VERIFICATION
+   ▲                            │            │
+   └────────────────────────────┘            │  (approved design changes)
+   ▲                                         │
+   └─────────────────────────────────────────┘  (cycle repeats until done)
+```
+
+| Phase | Primary Skills | Core Rule |
+|-------|---------------|-----------|
+| **Design** | `spec-driven-development` | No code before the design is approved by the human |
+| **Development** | `incremental-implementation` + `test-driven-development` | Follow the approved design strictly; no scope deviation without human approval |
+| **Testing** | `test-driven-development` (Testing Phase Independence section) | Run tests and report results. **Do not modify the implementation.** |
+| **Verification** | `spec-driven-development` (Iterative Refinement section) | Propose minimal, evidence-backed design changes; obtain human approval before re-entering Development |
+
+### Universal Agent Rules
+
+These rules are non-negotiable in every phase and every tool:
+
+1. **Phase Declaration** — Begin every interaction by declaring the current phase:
+
+   ```
+   [DESIGN] / [DEVELOPMENT] / [TESTING] / [VERIFICATION]
+   ```
+
+2. **Human Approval Gates** — Do not advance to the next phase without explicit human sign-off. Ask; never assume.
+
+3. **No Code Modification During Testing** — In the Testing phase, record and report results only. Never edit the implementation to make a test pass.
+
+4. **Pre-Modification Review** — Before creating or modifying any artifact:
+   - Confirm the content does not already exist (avoid duplication)
+   - Modify existing artifacts rather than creating new ones
+   - Apply the **Minimal Change Principle**: change only what is strictly necessary
+
+5. **Evidence-Based Changes** — Any proposed design modification must reference the specific failing test(s), the exact deviation from expected behaviour, and the smallest correction that resolves it.
+
+6. **Commit After Each Phase** — Commit design documents after Design; code + tests after Development; test output after Testing; refined design after Verification.
+
+7. **Production Acceptance Declaration** — Before any merge to `main` or production deploy: complete the 13-item Production-Readiness Checklist (in `shipping-and-launch`), summarise findings (including deviations or waived items), and obtain explicit human approval.
+
+8. **Real-System Validation** — Validate against the actual target system or a strictly identical environment. If real-system validation is not feasible, document why, provide a validation plan, and obtain human approval before proceeding with any alternative.
+
+---
 
 ## OpenCode Integration
 
