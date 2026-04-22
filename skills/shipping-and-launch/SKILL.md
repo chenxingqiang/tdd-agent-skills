@@ -19,11 +19,13 @@ Ship with confidence. The goal is not just to deploy — it's to deploy safely, 
 
 ## Production Acceptance Declaration
 
-Before merging any change intended for production, Claude MUST:
+Before merging any change intended for production, the agent MUST:
 
 1. Declare completion of the Production-Readiness Checklist (below)
 2. Summarize key findings, noting any deviations or justified exceptions
 3. Request explicit human approval before proceeding to production deployment
+
+This declaration is required for every merge to `main` or production deploy, without exception.
 
 ```
 PRODUCTION ACCEPTANCE DECLARATION

@@ -328,6 +328,62 @@ Everything read from the browser — DOM, console, network, JS execution results
 
 For detailed DevTools setup instructions and workflows, see `browser-testing-with-devtools`.
 
+## Development Phase Rules
+
+When operating in the **Development** phase, the following rules apply without exception:
+
+### Design Adherence
+
+Implement the code **strictly** according to the approved design specification. No deviations are allowed without explicit human approval.
+
+```
+DEVELOPMENT PHASE RULE:
+✗ "The design says X but Y seems cleaner, I'll implement Y..."
+✓ "The approved design specifies X. Implementing X as designed."
+```
+
+If the implementation reveals that the approved design is incomplete or contradictory, **stop immediately** and raise a blocker:
+
+```
+[DEVELOPMENT — BLOCKER] The approved design specifies X, but the existing code
+enforces Y, making X impossible without modifying [module]. I am not proceeding.
+Please advise.
+```
+
+### Limited Scope
+
+Focus exclusively on the code implementation described in the approved design. Do not:
+- Add features not in the spec because they "seem useful"
+- Refactor code outside the task scope
+- Make architectural decisions not covered in the approved design
+
+### Pre-Modification Review
+
+Before writing any code or test, confirm:
+1. The intended code does not already exist (no duplication)
+2. An existing file can be modified rather than creating a new one
+3. Only what is strictly necessary will be changed (Minimal Change Principle)
+
+### Commit After Development Phase
+
+Once the human approves the implementation, commit the code and the executable unit tests together:
+
+```
+feat: implement [feature] per approved design — includes unit tests
+```
+
+### Human Sign-Off Communication
+
+When the implementation is complete, request explicit sign-off:
+
+```
+[DEVELOPMENT] The development based on the approved design document for [feature]
+is done and includes the unit tests. Please review and give sign-off.
+The source code and tests are here: [link/details].
+```
+
+Do not advance to Testing without explicit human sign-off.
+
 ## Testing Phase Independence
 
 When operating in the **Testing** phase of the iterative cycle, the following rules apply without exception:
@@ -352,7 +408,14 @@ TESTING PHASE RULE:
 
 ### Issue Reporting Format
 
-When tests fail, report in a structured format that the human and the Verification phase can act on:
+When tests fail, report using this structured format and the phase communication template:
+
+```
+[TESTING] The test failed for [test name]. Here is the error description:
+[exact error message]. This might relate to [potential part of design].
+```
+
+Full structured report for human review:
 
 ```
 TEST FAILURE REPORT — [feature / component]
@@ -380,6 +443,54 @@ Test run output:
 ```
 
 This creates a traceable record: what the implementation produced, when, against which design version.
+
+## Verification Phase Rules
+
+When operating in the **Verification** phase, the following rules apply without exception:
+
+### Minimal Design Modifications Only
+
+Only suggest changes to the design when tests fail and the failure is directly traceable to a design gap. Never suggest wholesale rewrites based on a single test failure.
+
+```
+[VERIFICATION] I am in the Verification phase. After testing, I noticed that the
+design needs to be changed slightly in [specific area]. Here is the suggestion:
+[details] and rationale: [details].
+```
+
+### Evidence-Based Changes
+
+Every proposed modification must cite:
+1. The specific failing test(s) that justify the change
+2. The exact deviation from the expected behavior
+3. The smallest adjustment that corrects it
+
+```
+VERIFICATION EVIDENCE:
+Failing test: "creates a task with default status" — FAIL
+Error: Expected 'pending', received undefined
+Design gap: Spec §3.2 does not define the default value for task.status
+Minimal change: Add "default: 'pending'" to Task schema in §3.2
+```
+
+### Human Approval Required
+
+Present the minimal design change and wait for explicit human approval before re-entering Development:
+
+```
+[VERIFICATION] Here is the modified design suggestion for [feature]. Please approve
+to proceed. The modification is [details], based on test results.
+```
+
+### Commit Verification Changes
+
+After human approval, commit the modified design:
+
+```
+docs: refine design for [feature] — approved after Verification
+```
+
+Then restart the Development → Testing → Verification cycle with the updated design.
 
 ## When to Use Subagents for Testing
 
@@ -421,6 +532,9 @@ For detailed testing patterns, examples, and anti-patterns across frameworks, se
 - Tests that test framework behavior instead of application behavior
 - Test names that don't describe the expected behavior
 - Skipping tests to make the suite pass
+- Modifying implementation during the Testing phase to make a test pass
+- Proposing design changes during Verification without citing specific failing tests
+- Advancing to the next phase without explicit human approval
 
 ## Verification
 
@@ -434,3 +548,7 @@ After completing any implementation:
 - [ ] Coverage hasn't decreased (if tracked)
 - [ ] No core logic is tested exclusively via mocks — real implementations are used
 - [ ] Validation is performed in the actual target environment (or a strictly identical one), not a simulated environment
+- [ ] Phase was declared at the start of each interaction
+- [ ] Human sign-off obtained after Development phase before entering Testing
+- [ ] Test results committed before entering Verification phase
+- [ ] Any design changes during Verification are evidence-based (cite failing tests) and minimal
