@@ -1,6 +1,6 @@
-# agent-skills
+# tdd-agent-skills
 
-This is the agent-skills project — a collection of production-grade engineering skills for AI coding agents.
+This is the tdd-agent-skills project — a collection of production-grade Test-Driven Development skills for AI coding agents. Authored by Chen Xingqiang.
 
 ## Project Structure
 

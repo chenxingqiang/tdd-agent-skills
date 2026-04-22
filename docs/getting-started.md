@@ -1,6 +1,6 @@
-# Getting Started with agent-skills
+# Getting Started with tdd-agent-skills
 
-agent-skills works with any AI coding agent that accepts Markdown instructions. This guide covers the universal approach. For tool-specific setup, see the dedicated guides.
+tdd-agent-skills works with any AI coding agent that accepts Markdown instructions. This guide covers the universal approach. For tool-specific setup, see the dedicated guides.
 
 ## How Skills Work
 
@@ -13,7 +13,7 @@ Each skill is a Markdown file (`SKILL.md`) that describes a specific engineering
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/addyosmani/agent-skills.git
+git clone https://github.com/chenxingqiang/tdd-agent-skills.git
 ```
 
 ### 2. Choose a skill

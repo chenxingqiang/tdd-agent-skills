@@ -1,19 +1,19 @@
 {
-  "name": "addy-agent-skills",
+  "name": "chen-tdd-agent-skills",
   "owner": {
-    "name": "Addy Osmani"
+    "name": "Chen Xingqiang"
   },
   "metadata": {
-    "description": "Production-grade engineering skills for AI coding agents — covering the full software development lifecycle from spec to ship."
+    "description": "Production-grade Test-Driven Development skills for AI coding agents — covering the full software development lifecycle from spec to ship, with TDD at the core."
   },
   "plugins": [
     {
-      "name": "agent-skills",
+      "name": "tdd-agent-skills",
       "source": {
         "source": "github",
-        "repo": "addyosmani/agent-skills"
+        "repo": "chenxingqiang/tdd-agent-skills"
       },
-      "description": "Production-grade engineering skills covering every phase of software development: spec, plan, build, verify, review, and ship."
+      "description": "Production-grade TDD skills covering every phase of software development: spec, plan, test-first build, verify, review, and ship."
     }
   ]
 }
