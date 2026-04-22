@@ -18,7 +18,7 @@ Document decisions, not just code. The most valuable documentation captures the 
 - Onboarding new team members (or agents) to the project
 - When you find yourself explaining the same thing repeatedly
 
-**When NOT to use:** Don't document obvious code. Don't add comments that restate what the code already says. Don't write docs for throwaway prototypes.
+**When NOT to use:** Don't document obvious code. Don't add comments that restate what the code already says. Don't write docs for throwaway prototypes. **Never create summary reports, status documents, or progress write-ups** that are not directly integral to the development logic — these are superfluous artifacts that add noise without value.
 
 ## Architecture Decision Records (ADRs)
 
@@ -218,6 +218,16 @@ Link to ADRs for details.
 How to contribute, coding standards, PR process.
 ```
 
+## README Maintenance
+
+**Updating the README is the primary documentation task after any feature completion.** Before closing any task or opening a PR:
+
+1. Review the README to see if setup steps, commands, architecture overview, or feature descriptions are now stale.
+2. Update the relevant sections to reflect the new state of the project.
+3. Do not create separate feature-summary documents — the README is the canonical entry point.
+
+The README update should be part of the same commit as the feature, not an afterthought.
+
 ## Changelog Maintenance
 
 For shipped features:
@@ -236,6 +246,80 @@ For shipped features:
 ### Changed
 - Task list now loads 50 items per page (was 20) for better UX (#126)
 ```
+
+## Core Logic Change Logging
+
+Any change to important project experience, architectural decisions, or core business logic must be explicitly recorded in the `.cursorrules` file (or the project's designated decision log, e.g., `CLAUDE.md` or `docs/decisions/changes.md`).
+
+### When to Create a Log Entry
+
+- Architectural pattern or framework decision changed
+- Core business rule or domain logic modified
+- Data model or database schema altered in a breaking way
+- Security model, authentication, or authorization approach changed
+- API contract modified in a backward-incompatible way
+- Any decision that would be expensive to reverse
+
+### Log Entry Format
+
+```markdown
+## Change Log Entry
+
+**Date:** YYYY-MM-DD
+**Author:** [Name or agent ID]
+
+**Reason for change:**
+[Describe the context, trigger, and decision drivers. Why was this change needed?
+ What problem does it solve? What constraints apply?]
+
+**Scope & Impact:**
+[Affected modules, components, and files. What behavior changes for downstream consumers?]
+
+**Migration / Compatibility Notes:**
+[Steps required for existing deployments or data. Any breaking changes.
+ Rollback procedure if the change needs to be reverted.]
+
+**Related Commits / Issues:**
+[Links to commits, PRs, GitHub issues, or ADR numbers for full traceability]
+```
+
+### Example
+
+```markdown
+## Change Log Entry
+
+**Date:** 2025-06-01
+**Author:** Claude (claude-3-7-sonnet)
+
+**Reason for change:**
+Switched task ID generation from UUIDs to ULID (Universally Unique Lexicographically Sortable Identifier).
+Driver: dashboard pagination was slow because UUID-indexed rows cannot be efficiently cursor-paginated.
+ULID provides the same uniqueness guarantees while being sortable by creation time.
+
+**Scope & Impact:**
+- `src/lib/id.ts` — generateId() now returns ULID format
+- `src/db/schema.ts` — task.id column type remains VARCHAR(26) (ULID is 26 chars vs UUID 36)
+- All new tasks created after this change will have ULID ids; existing tasks retain UUIDs.
+
+**Migration / Compatibility Notes:**
+- Existing UUID ids remain valid and unchanged.
+- Clients that relied on UUID format for validation regex must update their validation.
+- No database migration required — column type is compatible.
+- Rollback: revert `src/lib/id.ts`; existing ULIDs will still sort correctly.
+
+**Related Commits / Issues:**
+- Commit: abc1234 "feat: switch task ID generation to ULID"
+- Issue: #47 "Dashboard pagination is slow for large accounts"
+- ADR: docs/decisions/ADR-004-task-id-format.md
+```
+
+### Placement
+
+- **`.cursorrules`** — for changes to agent behavior rules and AI-specific conventions
+- **`CLAUDE.md`** — for agent-facing project conventions
+- **`docs/decisions/changes.md`** — for architectural and business logic changes (append-only log)
+
+When in doubt, record in all applicable locations. The goal is traceability: a future engineer or agent reading the codebase six months later should be able to find exactly why a core decision was made and by whom.
 
 ## Documentation for Agents
 
@@ -271,8 +355,9 @@ Special consideration for AI agent context:
 After documenting:
 
 - [ ] ADRs exist for all significant architectural decisions
-- [ ] README covers quick start, commands, and architecture overview
+- [ ] README updated to reflect any new or changed functionality
 - [ ] API functions have parameter and return type documentation
 - [ ] Known gotchas are documented inline where they matter
 - [ ] No commented-out code remains
 - [ ] Rules files (CLAUDE.md etc.) are current and accurate
+- [ ] No superfluous summary reports or status documents were created

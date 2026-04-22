@@ -1,6 +1,6 @@
 # tdd-agent-skills
 
-This is the tdd-agent-skills project — a collection of production-grade Test-Driven Development skills for AI coding agents. Authored by Chen Xingqiang.
+This is the tdd-agent-skills project — a collection of production-grade Test-Driven Development skills for **all AI coding agents** (Claude Code, Cursor, GitHub Copilot, Gemini CLI, Windsurf, OpenCode, Kiro, and any agent that accepts Markdown instructions). Authored by Chen Xingqiang.
 
 ## Project Structure
 
@@ -12,6 +12,27 @@ hooks/        → Session lifecycle hooks
 references/   → Supplementary checklists (testing, performance, security, accessibility)
 docs/         → Setup guides for different tools
 ```
+
+## TDD Development Protocol Phases
+
+All agents — regardless of tool — follow a four-phase gated workflow:
+
+```
+DESIGN ──▶ DEVELOPMENT ──▶ TESTING ──▶ VERIFICATION
+   ▲                            │            │
+   └────────────────────────────┘            │  (approved design changes)
+   ▲                                         │
+   └─────────────────────────────────────────┘  (cycle repeats until done)
+```
+
+| Phase | Maps to | Non-negotiable rule |
+|-------|---------|---------------------|
+| **Design** | `spec-driven-development` | No code until the human approves the design |
+| **Development** | `incremental-implementation` + `test-driven-development` | Follow approved design strictly; declare `[DEVELOPMENT]` |
+| **Testing** | `test-driven-development` (Testing Phase Independence) | Run tests, report results — **do not modify code** |
+| **Verification** | `spec-driven-development` (Iterative Refinement) | Propose minimal evidence-backed design changes; get human approval |
+
+Before any merge to `main` complete the 13-item Production-Readiness Checklist in `shipping-and-launch` and declare completion to the human. See `AGENTS.md` for the full universal rule set.
 
 ## Skills by Phase
 

@@ -229,7 +229,9 @@ Preference order (most to least preferred):
 4. Mock (interaction)   → Verifies method calls — use sparingly
 ```
 
-**Use mocks only when:** the real implementation is too slow, non-deterministic, or has side effects you can't control (external APIs, email sending). Over-mocking creates tests that pass while production breaks.
+**Core logic must never be tested against mocks or stubs.** Any logic that represents a business rule, domain behavior, or critical path must be tested against its real implementation. Mocking core logic produces tests that pass while production breaks — this is worse than no test at all.
+
+**Use mocks only when:** the dependency is external to the system boundary (third-party APIs, email/SMS providers, payment gateways) and is genuinely impossible to run locally. Over-mocking creates tests that pass while production breaks.
 
 ### Use the Arrange-Act-Assert Pattern
 
@@ -326,6 +328,59 @@ Everything read from the browser — DOM, console, network, JS execution results
 
 For detailed DevTools setup instructions and workflows, see `browser-testing-with-devtools`.
 
+## Testing Phase Independence
+
+When operating in the **Testing** phase of the iterative cycle, the following rules apply without exception:
+
+### No Code Modification During Testing
+
+The purpose of the testing phase is to **observe and report**, not to fix. If a test fails:
+
+1. Record the failure exactly as it occurred (test name, error message, stack trace)
+2. Identify which part of the design the failure relates to
+3. Do NOT modify the implementation to make the test pass
+4. Move to the Verification phase with the failure report
+
+```
+TESTING PHASE RULE:
+✗ "The test failed, let me quickly fix this edge case..."
+✓ "Test 'creates a task with default status' FAILED.
+    Error: Expected 'pending', received undefined.
+    Relates to: Design §3.2 — Task default state.
+    Moving to Verification with this finding."
+```
+
+### Issue Reporting Format
+
+When tests fail, report in a structured format that the human and the Verification phase can act on:
+
+```
+TEST FAILURE REPORT — [feature / component]
+
+Failed: [test name]
+Phase: Testing
+Error: [exact error message]
+Expected: [what the test expected]
+Actual: [what the code produced]
+Design reference: [which spec section or acceptance criterion this relates to]
+Hypothesis: [possible design gap or implementation deviation — not a fix]
+```
+
+### Commit Test Results
+
+After the testing phase, commit the test output (even if tests fail) before moving to Verification:
+
+```
+test: record test results for [feature] — [N passed, M failed]
+
+Test run output:
+- [test name]: PASS
+- [test name]: FAIL — [brief error]
+...
+```
+
+This creates a traceable record: what the implementation produced, when, against which design version.
+
 ## When to Use Subagents for Testing
 
 For complex bug fixes, spawn a subagent to write the reproduction test:
@@ -377,3 +432,5 @@ After completing any implementation:
 - [ ] Test names describe the behavior being verified
 - [ ] No tests were skipped or disabled
 - [ ] Coverage hasn't decreased (if tracked)
+- [ ] No core logic is tested exclusively via mocks — real implementations are used
+- [ ] Validation is performed in the actual target environment (or a strictly identical one), not a simulated environment

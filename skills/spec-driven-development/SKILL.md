@@ -162,6 +162,134 @@ Break the plan into discrete, implementable tasks:
 
 Execute tasks one at a time following `incremental-implementation` and `test-driven-development` skills. Use `context-engineering` to load the right spec sections and source files at each step rather than flooding the agent with the entire spec.
 
+## Iterative Refinement Cycle
+
+After implementation, follow the TDD iterative cycle until all requirements are met:
+
+```
+Design ──→ Development ──→ Testing ──→ Verification
+   ▲                            │           │
+   └────────────────────────────┘           │
+         (if design changes needed)         │
+   ▲                                        │
+   └────────────────────────────────────────┘
+         (if verification reveals gaps)
+```
+
+- **Development:** Implement against the approved spec. No scope deviation without human approval.
+- **Testing:** Execute tests against the implementation. Do not modify code during the testing phase — only report results and identify deviations.
+- **Verification:** Evaluate test results. Suggest *minimal* design changes supported by concrete test evidence. Obtain human approval before applying changes.
+- **Refinement:** Apply approved design changes, then restart Development → Testing → Verification. Each cycle gets its own commit.
+
+**Evidence-Based Modifications:** Any proposed design change during Verification must cite the specific failing test(s), the exact deviation from the expected behavior, and the smallest adjustment that would correct it. Never suggest broad rewrites based on a single test failure.
+
+## Phase Communication Protocol
+
+Declare the current phase at the start of each interaction. This prevents scope confusion and ensures the human always knows what kind of response is appropriate.
+
+**Phase declarations:**
+
+```
+"[DESIGN] I am clarifying requirements for [feature]. Can you confirm [specific assumption]?"
+
+"[DEVELOPMENT] Implementing [feature] per the approved spec. Scope: [files]. Proceeding."
+
+"[TESTING] Running tests for [feature]. No code changes will be made in this phase."
+
+"[VERIFICATION] Tests complete. [N] passed, [M] failed. I have a minimal design change
+ suggestion for [specific area]. Here is the evidence: [test output]. Rationale: [reason].
+ Request approval before proceeding."
+```
+
+**Feedback gate:** Whenever human action is required before proceeding, Claude MUST state:
+1. What decision or input is needed
+2. Why it is needed
+3. What will happen next once the human responds
+
+```
+"Before proceeding to development: the spec references 'user authentication' but does not
+ specify whether to use session cookies or JWTs. This affects the DB schema and security model.
+ Please confirm the approach so I can finalize the spec and begin implementation."
+```
+
+**Design adherence:** During Development, if the implementation reveals that the approved design is incomplete or contradictory, stop and raise it:
+
+```
+"[DEVELOPMENT — BLOCKER] The approved design specifies X, but the existing code enforces Y,
+ making X impossible without modifying [module]. I am not proceeding. Please advise."
+```
+
+## Production-Grade Elegance
+
+Every design must aim for elegance before being marked approved:
+
+- **Small, well-defined interfaces** — each function/class does one thing, has a narrow surface area, and a predictable contract
+- **Clear separation of concerns** — boundaries between layers are explicit; no business logic in infrastructure, no infrastructure details in domain code
+- **Predictable failure modes** — every error path is defined; no silent failures; errors propagate cleanly to the caller
+- **Minimal surface area** — expose only what callers need; default to private/internal; add `public` only when justified
+
+Before approving a design, evaluate it: "Would a staff engineer reading this say it is production-ready?"
+
+## Design for Production
+
+Every spec approved for implementation must address these items (or explicitly justify their omission):
+
+```markdown
+## Production-Readiness (required before design approval)
+
+### Acceptance Criteria & Metrics
+- SLOs/SLAs: [latency targets, availability targets, error budget]
+- Success verification: [how we confirm the feature is working in production]
+
+### API Contracts & Versioning
+- Request/response schemas with types
+- Versioning strategy (e.g., path versioning, header versioning)
+- Backward-compatibility guarantees
+
+### Error Modes & Recovery
+- Expected error classes and their HTTP/gRPC status codes
+- Retry and backoff strategy
+- Idempotency requirements
+- Graceful degradation behavior when dependencies are unavailable
+
+### Observability
+- Key metrics to emit (counters, histograms, gauges)
+- Structured log fields for this feature
+- Tracing spans required
+- Expected dashboards and alert thresholds
+
+### Performance Budget
+- Throughput target (requests/sec or jobs/sec)
+- Latency target (p50, p95, p99)
+- Resource limits (CPU, memory, DB connections)
+- Scaling assumptions
+
+### Security & Dependencies
+- Threat model: who can call this? what can they do?
+- Required security reviews (auth, authz, data validation)
+- New dependencies: license checked, vulnerability scan passed
+
+### Deployment & Rollback
+- Canary / blue-green / feature-flag strategy
+- Data migration plan (if applicable)
+- Rollback procedure and maximum time-to-rollback
+
+### Test Matrix
+- Unit tests: [scope]
+- Integration tests: [scope]
+- End-to-end tests: [critical flows only]
+- Performance tests: [thresholds]
+- Security tests: [attack surfaces]
+
+### Runbook Outline
+- How to detect this feature is broken
+- Key dashboards and log queries
+- Rollback steps
+- On-call escalation path
+```
+
+These items must be present or explicitly waived (with human approval) before a design is marked approved.
+
 ## Keeping the Spec Alive
 
 The spec is a living document, not a one-time artifact:
@@ -198,3 +326,7 @@ Before proceeding to implementation, confirm:
 - [ ] Success criteria are specific and testable
 - [ ] Boundaries (Always/Ask First/Never) are defined
 - [ ] The spec is saved to a file in the repository
+- [ ] Production-Readiness section is present or each item is explicitly waived with human approval
+- [ ] Design evaluated against Production-Grade Elegance criteria
+- [ ] Phase Communication Protocol in use (phase declared at start of each interaction)
+- [ ] Any design changes during Verification are evidence-based (cite failing tests) and minimal

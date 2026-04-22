@@ -132,6 +132,30 @@ NOTICED BUT NOT TOUCHING:
 → Want me to create tasks for these?
 ```
 
+### Rule 0.6: Minimize File Creation
+
+The default action is to **modify existing files**, not create new ones. Creating a new file requires an explicit architectural justification.
+
+Before creating a new file, ask:
+- Does an existing file have a logically coherent place for this code?
+- Is this genuinely a new module, or could it extend an existing one?
+
+If a new file must be created, state why:
+
+```
+NEW FILE JUSTIFICATION:
+- File: src/lib/rate-limiter.ts
+- Reason: Rate-limiting logic has no existing home; it's a distinct, reusable module
+  with its own test surface. Placing it in any existing file would violate
+  single-responsibility and make it hard to test in isolation.
+→ Architectural justification approved?
+```
+
+**Never** create:
+- Helper scripts for one-time operations
+- Summary or report documents not integral to the development logic
+- Utility files for code used in only one place — inline it instead
+
 ### Rule 1: One Thing at a Time
 
 Each increment changes one logical thing. Don't mix concerns:
@@ -207,6 +231,8 @@ After each increment, verify:
 - [ ] Linting passes (`npm run lint`)
 - [ ] The new functionality works as expected
 - [ ] The change is committed with a descriptive message
+- [ ] No new files were created without explicit architectural justification
+- [ ] Validation was performed in the real target environment, not a simulated one
 
 ## Common Rationalizations
 
