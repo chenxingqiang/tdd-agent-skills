@@ -80,6 +80,7 @@ done < <(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d -print0 | sort -z)
 # ─── Argument parsing ─────────────────────────────────────────────────────────
 
 TARGET_DIR="$(pwd)"
+TARGET_DIR_EXPLICIT=false
 TOOLS=""
 GLOBAL=false
 
@@ -116,8 +117,8 @@ EOF
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --tool)    TOOLS="$2";       shift 2 ;;
-    --target)  TARGET_DIR="$2";  shift 2 ;;
+    --tool)    TOOLS="$2";                              shift 2 ;;
+    --target)  TARGET_DIR="$2"; TARGET_DIR_EXPLICIT=true; shift 2 ;;
     --global)  GLOBAL=true;      shift   ;;
     --help|-h) usage; exit 0            ;;
     *) error "Unknown option: $1"; usage; exit 1 ;;
@@ -395,43 +396,64 @@ install_kiro() {
 install_claude() {
   header "Installing for Claude Code"
 
-  if $GLOBAL; then
-    local dest="$HOME/.claude/plugins/tdd-agent-skills"
-    info "Installing plugin to $dest/"
-    mkdir -p "$dest"
-
-    # Copy the whole repo structure needed for the plugin
-    cp -r "$SKILLS_DIR"    "$dest/skills"
-    cp -r "$AGENTS_DIR"    "$dest/agents"
-    cp -r "$SCRIPT_DIR/hooks" "$dest/hooks"
-    cp -r "$SCRIPT_DIR/.claude" "$dest/.claude" 2>/dev/null || true
-    [ -f "$SCRIPT_DIR/AGENTS.md" ] && cp "$SCRIPT_DIR/AGENTS.md" "$dest/AGENTS.md"
-    [ -f "$SCRIPT_DIR/CLAUDE.md" ] && cp "$SCRIPT_DIR/CLAUDE.md" "$dest/CLAUDE.md"
-
-    success "Claude Code plugin installed to $dest/"
-    dim "  → Start Claude Code with: claude --plugin-dir $dest"
-    dim "  → Or add to .claude/settings.json: {\"pluginDirs\": [\"$dest\"]}"
+  # Claude Code user-level config lives in ~/.claude/.
+  # Default to that unless --target explicitly points to a project directory.
+  local claude_dest
+  if $TARGET_DIR_EXPLICIT && ! $GLOBAL; then
+    claude_dest="$TARGET_DIR/.claude"
+    info "Installing into project: $TARGET_DIR/.claude/"
   else
-    local dest="$TARGET_DIR"
-    info "Copying plugin files to project: $dest/"
-
-    mkdir -p "$dest/.claude/commands"
-    cp -r "$SCRIPT_DIR/.claude/commands/." "$dest/.claude/commands/" 2>/dev/null || true
-
-    mkdir -p "$dest/skills"
-    cp -r "$SKILLS_DIR/." "$dest/skills/"
-
-    mkdir -p "$dest/agents"
-    cp -r "$AGENTS_DIR/." "$dest/agents/"
-
-    [ -f "$SCRIPT_DIR/AGENTS.md" ] && cp "$SCRIPT_DIR/AGENTS.md" "$dest/AGENTS.md"
-    [ -f "$SCRIPT_DIR/CLAUDE.md" ] && cp "$SCRIPT_DIR/CLAUDE.md" "$dest/CLAUDE.md"
-
-    success "Claude Code files installed to $dest/"
-    dim "  → Use marketplace: /plugin marketplace add chenxingqiang/tdd-agent-skills"
-    dim "  → Or run:          claude --plugin-dir $dest"
+    claude_dest="$HOME/.claude"
+    info "Installing into user config: $HOME/.claude/"
   fi
 
+  # ── Skills ────────────────────────────────────────────────────────────────
+  # Each skill is installed as its own subdirectory so Claude Code can load it
+  # by name: ~/.claude/skills/<skill-name>/SKILL.md
+  local skills_dest="$claude_dest/skills"
+  info "Installing skills to $skills_dest/"
+  mkdir -p "$skills_dest"
+  for skill in "${SKILL_NAMES[@]}"; do
+    local src="$SKILLS_DIR/$skill"
+    if [ -d "$src" ]; then
+      mkdir -p "$skills_dest/$skill"
+      cp -r "$src/." "$skills_dest/$skill/"
+      success "  $skill"
+    fi
+  done
+
+  # ── Slash commands ────────────────────────────────────────────────────────
+  local commands_dest="$claude_dest/commands"
+  info "Installing commands to $commands_dest/"
+  mkdir -p "$commands_dest"
+  if [ -d "$SCRIPT_DIR/.claude/commands" ]; then
+    cp -r "$SCRIPT_DIR/.claude/commands/." "$commands_dest/"
+    success "Commands installed to $commands_dest/"
+  fi
+
+  # ── Agent personas ────────────────────────────────────────────────────────
+  local agents_dest="$claude_dest/agents"
+  info "Installing agents to $agents_dest/"
+  mkdir -p "$agents_dest"
+  for agent_file in "$AGENTS_DIR"/*.md; do
+    [ -f "$agent_file" ] || continue
+    cp "$agent_file" "$agents_dest/$(basename "$agent_file")"
+    success "  $(basename "$agent_file")"
+  done
+
+  # ── AGENTS.md / CLAUDE.md ─────────────────────────────────────────────────
+  if $TARGET_DIR_EXPLICIT && ! $GLOBAL; then
+    [ -f "$SCRIPT_DIR/AGENTS.md" ] && cp "$SCRIPT_DIR/AGENTS.md" "$TARGET_DIR/AGENTS.md" \
+      && success "AGENTS.md → $TARGET_DIR/AGENTS.md"
+    [ -f "$SCRIPT_DIR/CLAUDE.md" ] && cp "$SCRIPT_DIR/CLAUDE.md" "$TARGET_DIR/CLAUDE.md" \
+      && success "CLAUDE.md → $TARGET_DIR/CLAUDE.md"
+  fi
+
+  success "Claude Code installed to $claude_dest/"
+  dim "  → Skills:   $skills_dest/"
+  dim "  → Commands: $commands_dest/ (available as slash commands)"
+  dim "  → Agents:   $agents_dest/"
+  dim "  → Start a new Claude Code session — skills and commands load automatically."
   dim "  → See README.md Quick Start → Claude Code for full instructions."
 }
 

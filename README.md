@@ -100,7 +100,7 @@ The `--tool` flag table:
 | `--tool copilot` | GitHub Copilot — skills, agents, `copilot-instructions.md` |
 | `--tool opencode` | OpenCode — `AGENTS.md` + `skills/` in your project |
 | `--tool kiro` | Kiro — all skills → `.kiro/skills/` |
-| `--tool claude` | Claude Code — local plugin layout |
+| `--tool claude` | Claude Code — skills → `~/.claude/skills/`, commands → `~/.claude/commands/`, agents → `~/.claude/agents/` |
 | `--tool all` | Every tool above |
 
 **Common options:**
