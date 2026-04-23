@@ -14,6 +14,7 @@ TDD Agent Skills encodes Test-Driven Development workflows, quality gates, and b
  │Refine│      │  PRD │      │First │      │ Impl │      │ Gate │      │ Live │
  └──────┘      └──────┘      └──────┘      └──────┘      └──────┘      └──────┘
   /spec          /plan          /test         /build        /review       /ship
+                                                         /code-simplify
 ```
 
 ---
@@ -36,6 +37,29 @@ This project is governed by the following principles — all development artifac
 9. **Pre-Modification Review:** Before any change, a comprehensive review of existing materials must be performed. Changes must be minimal, necessary, and applied to existing artifacts.
 10. **Human Approval Gate:** All critical decisions and modifications require review and approval by the human programmer.
 11. **Collaborative Iteration:** Work closely through iterative cycles of Design → Development → Testing → Verification → Refinement.
+
+---
+
+## Internal TDD Protocol
+
+Every agent and skill — regardless of which command triggered the work — follows a four-phase gated loop:
+
+```
+DESIGN ──▶ DEVELOPMENT ──▶ TESTING ──▶ VERIFICATION
+   ▲                            │            │
+   └────────────────────────────┘            │  (approved design changes)
+   ▲                                         │
+   └─────────────────────────────────────────┘  (cycle repeats until done)
+```
+
+| Phase | Skills Used | Non-Negotiable Rule |
+|-------|-------------|---------------------|
+| **Design** | `spec-driven-development` | No code until the human approves the design |
+| **Development** | `incremental-implementation` + `test-driven-development` | Follow the approved design strictly; no scope deviation without human approval |
+| **Testing** | `test-driven-development` | Run tests and report results — **never modify code during this phase** |
+| **Verification** | `spec-driven-development` (Iterative Refinement) | Propose minimal, evidence-backed changes; get human approval before re-entering Development |
+
+**Human approval gates exist between every phase.** The agent must ask — never assume.
 
 ---
 
