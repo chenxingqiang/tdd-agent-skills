@@ -59,22 +59,83 @@ Skills also activate automatically based on what you're doing — designing an A
 
 ## Quick Start
 
-<details>
-<summary><b>Claude Code (recommended)</b></summary>
+### One-click install
 
-**Marketplace install:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash
+```
+
+The installer fetches the repo automatically, then prompts you to choose a tool. Skip the prompt with `--tool`:
+
+```bash
+# Interactive (recommended — works with curl or a local clone)
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash
+
+# Non-interactive — pick a tool directly
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool cursor
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool windsurf
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool gemini
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool copilot
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool opencode
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool kiro
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool claude
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool all
+```
+
+Or clone first and run locally:
+
+```bash
+git clone https://github.com/chenxingqiang/tdd-agent-skills.git
+cd tdd-agent-skills
+bash install.sh
+```
+
+The `--tool` flag table:
+
+| Flag | Installs for |
+|------|-------------|
+| `--tool cursor` | Cursor — all skills → `.cursor/rules/` |
+| `--tool windsurf` | Windsurf — core skills → `.windsurfrules` |
+| `--tool gemini` | Gemini CLI — all skills → `.gemini/skills/` |
+| `--tool copilot` | GitHub Copilot — skills, agents, `copilot-instructions.md` |
+| `--tool opencode` | OpenCode — `AGENTS.md` + `skills/` in your project |
+| `--tool kiro` | Kiro — all skills → `.kiro/skills/` |
+| `--tool claude` | Claude Code — local plugin layout |
+| `--tool all` | Every tool above |
+
+**Common options:**
+
+```bash
+# Install into a specific project
+bash install.sh --tool cursor --target ~/my-project
+
+# Install to user-level config directories
+bash install.sh --tool cursor --global
+bash install.sh --tool gemini --global
+```
+
+> Run `bash install.sh --help` for the full option reference.
+
+---
+
+### Manual setup per tool
+
+<details>
+<summary><b>Claude Code</b></summary>
+
+**Marketplace (recommended):**
 
 ```
 /plugin marketplace add chenxingqiang/tdd-agent-skills
 /plugin install tdd-agent-skills@chen-tdd-agent-skills
 ```
 
-> **SSH errors?** The marketplace clones repos via SSH. If you don't have SSH keys set up on GitHub, either [add your SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) or switch to HTTPS for fetches only:
+> **SSH errors?** Switch to HTTPS for fetches:
 > ```bash
 > git config --global url."https://github.com/".insteadOf "git@github.com:"
 > ```
 
-**Local / development:**
+**Local:**
 
 ```bash
 git clone https://github.com/chenxingqiang/tdd-agent-skills.git
@@ -86,65 +147,55 @@ claude --plugin-dir /path/to/tdd-agent-skills
 <details>
 <summary><b>Cursor</b></summary>
 
-Copy any `SKILL.md` into `.cursor/rules/`, or reference the full `skills/` directory. See [docs/cursor-setup.md](docs/cursor-setup.md).
-
-</details>
-
-<details>
-<summary><b>Gemini CLI</b></summary>
-
-Install as native skills for auto-discovery, or add to `GEMINI.md` for persistent context. See [docs/gemini-cli-setup.md](docs/gemini-cli-setup.md).
-
-**Install from the repo:**
-
-```bash
-gemini skills install https://github.com/chenxingqiang/tdd-agent-skills.git --path skills
-```
-
-**Install from a local clone:**
-
-```bash
-gemini skills install ./tdd-agent-skills/skills/
-```
+Copy skills into `.cursor/rules/` — Cursor loads them automatically. See [docs/cursor-setup.md](docs/cursor-setup.md).
 
 </details>
 
 <details>
 <summary><b>Windsurf</b></summary>
 
-Add skill contents to your Windsurf rules configuration. See [docs/windsurf-setup.md](docs/windsurf-setup.md).
+Append skill content to `.windsurfrules`. See [docs/windsurf-setup.md](docs/windsurf-setup.md).
 
 </details>
 
 <details>
-<summary><b>OpenCode</b></summary>
+<summary><b>Gemini CLI</b></summary>
 
-Uses agent-driven skill execution via AGENTS.md and the `skill` tool.
+```bash
+gemini skills install https://github.com/chenxingqiang/tdd-agent-skills.git --path skills
+```
 
-See [docs/opencode-setup.md](docs/opencode-setup.md).
+Or install from a local clone and verify with `/skills list`. See [docs/gemini-cli-setup.md](docs/gemini-cli-setup.md).
 
 </details>
 
 <details>
 <summary><b>GitHub Copilot</b></summary>
 
-Use agent definitions from `agents/` as Copilot personas and skill content in `.github/copilot-instructions.md`. See [docs/copilot-setup.md](docs/copilot-setup.md).
+Copy skills to `.github/skills/`, agents to `.github/agents/`, and add summaries to `.github/copilot-instructions.md`. See [docs/copilot-setup.md](docs/copilot-setup.md).
 
 </details>
 
 <details>
-  <summary><b>Kiro IDE & CLI </b></summary>
-  Skills for Kiro reside under ".kiro/skills/" and can be stored under Project or Global level. Kiro also supports Agents.md. See Kiro docs at https://kiro.dev/docs/skills/
+<summary><b>OpenCode</b></summary>
+
+Clone the repo, open it in OpenCode. The agent reads `AGENTS.md` and `skills/` automatically. See [docs/opencode-setup.md](docs/opencode-setup.md).
+
+</details>
+
+<details>
+<summary><b>Kiro</b></summary>
+
+Copy skills to `.kiro/skills/` (project) or `~/.kiro/skills/` (global). Kiro also reads `AGENTS.md`. See [Kiro skills docs](https://kiro.dev/docs/skills/).
+
 </details>
 
 <details>
 <summary><b>Codex / Other Agents</b></summary>
 
-Skills are plain Markdown - they work with any agent that accepts system prompts or instruction files. See [docs/getting-started.md](docs/getting-started.md).
+Skills are plain Markdown — paste any `SKILL.md` into a system prompt, rules file, or conversation. See [docs/getting-started.md](docs/getting-started.md).
 
 </details>
-
-
 
 ---
 
@@ -264,6 +315,7 @@ Every skill follows a consistent anatomy:
 
 ```
 tdd-agent-skills/
+├── install.sh                         # One-click installer for all tools
 ├── skills/                            # 20 core skills (SKILL.md per directory)
 │   ├── idea-refine/                   #   Define
 │   ├── spec-driven-development/       #   Define
