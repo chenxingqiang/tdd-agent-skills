@@ -103,6 +103,7 @@ curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main
 curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool opencode
 curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool kiro
 curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool claude
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool trae
 curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool all
 ```
 
@@ -125,6 +126,7 @@ The `--tool` flag table:
 | `--tool opencode` | OpenCode — `AGENTS.md` + `skills/` in your project |
 | `--tool kiro` | Kiro — all skills → `.kiro/skills/` |
 | `--tool claude` | Claude Code — skills → `~/.claude/skills/`, commands → `~/.claude/commands/`, agents → `~/.claude/agents/` |
+| `--tool trae` | Trae — all skills → `.trae/rules/` |
 | `--tool all` | Every tool above |
 
 **Common options:**
@@ -211,6 +213,13 @@ Clone the repo, open it in OpenCode. The agent reads `AGENTS.md` and `skills/` a
 <summary><b>Kiro</b></summary>
 
 Copy skills to `.kiro/skills/` (project) or `~/.kiro/skills/` (global). Kiro also reads `AGENTS.md`. See [docs/kiro-setup.md](docs/kiro-setup.md).
+
+</details>
+
+<details>
+<summary><b>Trae</b></summary>
+
+Copy skills to `.trae/rules/` (project) or `~/.trae/rules/` (global). See [docs/trae-setup.md](docs/trae-setup.md).
 
 </details>
 

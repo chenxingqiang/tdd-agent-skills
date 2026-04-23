@@ -98,7 +98,7 @@ ${BOLD}Usage (local clone):${RESET}
 
 ${BOLD}Options:${RESET}
   --tool <name>     Tool(s) to install for (comma-separated).
-                    Supported: cursor, windsurf, gemini, copilot, opencode, kiro, claude
+                    Supported: cursor, windsurf, gemini, copilot, opencode, kiro, claude, trae
                     Use "all" to install for every supported tool.
   --target <path>   Target project directory (default: current directory)
   --global          Install to user-level config directories instead of the project
@@ -127,7 +127,7 @@ done
 
 # ─── Tool list ────────────────────────────────────────────────────────────────
 
-ALL_TOOLS="cursor windsurf gemini copilot opencode kiro claude"
+ALL_TOOLS="cursor windsurf gemini copilot opencode kiro claude trae"
 
 # ─── Interactive selection ────────────────────────────────────────────────────
 
@@ -147,6 +147,7 @@ interactive_select_tools() {
       opencode) label="OpenCode" ;;
       kiro)     label="Kiro IDE / CLI" ;;
       claude)   label="Claude Code" ;;
+      trae)     label="Trae" ;;
     esac
     echo "    [$i] $label"
     idx_map[$i]=$t
@@ -457,6 +458,23 @@ install_claude() {
   dim "  → See README.md Quick Start → Claude Code for full instructions."
 }
 
+install_trae() {
+  header "Installing for Trae"
+
+  local dest
+  if $GLOBAL; then
+    dest="$HOME/.trae/rules"
+  else
+    dest="$TARGET_DIR/.trae/rules"
+  fi
+
+  info "Copying all skills to $dest/"
+  copy_all_skills "$dest"
+  success "Trae setup complete."
+  dim "  → Rules in $dest/ are auto-loaded by Trae."
+  dim "  → See docs/trae-setup.md for tips on selective loading."
+}
+
 # ─── Dispatcher ───────────────────────────────────────────────────────────────
 
 run_installer() {
@@ -469,6 +487,7 @@ run_installer() {
     opencode) install_opencode ;;
     kiro)     install_kiro     ;;
     claude)   install_claude   ;;
+    trae)     install_trae     ;;
     *) error "Unknown tool: $tool (supported: $ALL_TOOLS)"; exit 1 ;;
   esac
 }
