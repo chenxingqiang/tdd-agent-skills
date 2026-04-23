@@ -59,6 +59,40 @@ Skills also activate automatically based on what you're doing — designing an A
 
 ## Quick Start
 
+### One-click install (recommended)
+
+```bash
+git clone https://github.com/chenxingqiang/tdd-agent-skills.git
+cd tdd-agent-skills
+bash install.sh
+```
+
+The installer asks which tool you use and sets everything up automatically. You can also skip the prompt:
+
+```bash
+bash install.sh --tool cursor          # Cursor
+bash install.sh --tool windsurf        # Windsurf
+bash install.sh --tool gemini          # Gemini CLI
+bash install.sh --tool copilot         # GitHub Copilot
+bash install.sh --tool opencode        # OpenCode
+bash install.sh --tool kiro            # Kiro IDE / CLI
+bash install.sh --tool claude          # Claude Code (local plugin)
+bash install.sh --tool all             # Every supported tool
+
+# Install into a specific project directory
+bash install.sh --tool cursor --target ~/my-project
+
+# Install to user-level config (not project-scoped)
+bash install.sh --tool gemini --global
+bash install.sh --tool cursor --global
+```
+
+> Run `bash install.sh --help` for the full option reference.
+
+---
+
+### Manual setup per tool
+
 <details>
 <summary><b>Claude Code (recommended)</b></summary>
 
