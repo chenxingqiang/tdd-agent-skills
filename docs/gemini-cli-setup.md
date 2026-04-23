@@ -2,7 +2,19 @@
 
 ## Setup
 
-### Option 1: Install as Skills (Recommended)
+### One-click install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool gemini
+```
+
+This copies all 20 skills as `.md` files into `.gemini/skills/` in your current directory. Use `--global` to install to `~/.gemini/skills/` instead:
+
+```bash
+bash install.sh --tool gemini --global
+```
+
+### Option 1: Install as Skills (via Gemini CLI)
 
 Gemini CLI has a native skills system that auto-discovers `SKILL.md` files in `.gemini/skills/` or `.agents/skills/` directories. Each skill activates on demand when it matches your task.
 

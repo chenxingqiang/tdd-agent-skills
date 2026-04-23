@@ -2,16 +2,31 @@
 
 ## Setup
 
-### Copilot Instructions
-
-Copilot supports creating agent skills using a `.github/skills`, `.claude/skills`, or `.agents/skills` directory in your repository.
+### One-click install (Recommended)
 
 ```bash
-mkdir -p .github
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool copilot
+```
 
-# Create files for essential skills
-cat /path/to/tdd-agent-skills/skills/test-driven-development/SKILL.md > .github/skills/test-driven-development/SKILL.md
-cat /path/to/tdd-agent-skills/skills/code-review-and-quality/SKILL.md > .github/skills/code-review-and-quality/SKILL.md
+This copies all 20 skills to `.github/skills/`, all agent personas to `.github/agents/`, and creates `.github/copilot-instructions.md` if it does not already exist.
+
+**Install into a specific project:**
+
+```bash
+bash install.sh --tool copilot --target ~/my-project
+```
+
+### Manual install
+
+Copilot supports creating agent skills using a `.github/skills/` directory in your repository. Each skill is a single `.md` file:
+
+```bash
+mkdir -p .github/skills
+
+# Copy individual skills as flat .md files
+cp /path/to/tdd-agent-skills/skills/test-driven-development/SKILL.md .github/skills/test-driven-development.md
+cp /path/to/tdd-agent-skills/skills/code-review-and-quality/SKILL.md .github/skills/code-review-and-quality.md
+cp /path/to/tdd-agent-skills/skills/incremental-implementation/SKILL.md .github/skills/incremental-implementation.md
 ```
 
 For more details, refer [Creating agent skills for GitHub Copilot](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-skills).
