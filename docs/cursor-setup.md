@@ -2,7 +2,21 @@
 
 ## Setup
 
-### Option 1: Rules Directory (Recommended)
+### One-click install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool cursor
+```
+
+This copies all 20 skills as `.md` files into `.cursor/rules/` in your current directory. Cursor loads them automatically.
+
+**Install into a specific project:**
+
+```bash
+bash install.sh --tool cursor --target ~/my-project
+```
+
+### Option 1: Rules Directory (Manual)
 
 Cursor supports a `.cursor/rules/` directory for project-specific rules:
 

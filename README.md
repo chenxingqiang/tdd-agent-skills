@@ -186,7 +186,7 @@ Clone the repo, open it in OpenCode. The agent reads `AGENTS.md` and `skills/` a
 <details>
 <summary><b>Kiro</b></summary>
 
-Copy skills to `.kiro/skills/` (project) or `~/.kiro/skills/` (global). Kiro also reads `AGENTS.md`. See [Kiro skills docs](https://kiro.dev/docs/skills/).
+Copy skills to `.kiro/skills/` (project) or `~/.kiro/skills/` (global). Kiro also reads `AGENTS.md`. See [docs/kiro-setup.md](docs/kiro-setup.md).
 
 </details>
 

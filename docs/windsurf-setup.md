@@ -2,7 +2,21 @@
 
 ## Setup
 
-### Project Rules
+### One-click install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool windsurf
+```
+
+This appends the core skills to `.windsurfrules` in your current directory (or creates the file if it does not exist). Windsurf loads `.windsurfrules` automatically.
+
+**Install into a specific project:**
+
+```bash
+bash install.sh --tool windsurf --target ~/my-project
+```
+
+### Manual setup
 
 Windsurf uses `.windsurfrules` for project-specific agent instructions:
 
