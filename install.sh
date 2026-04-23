@@ -1,7 +1,11 @@
 #!/bin/bash
 # install.sh — One-click installer for tdd-agent-skills
 #
-# Usage:
+# Usage (curl — no clone needed):
+#   curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool cursor
+#
+# Usage (local clone):
 #   bash install.sh                          # interactive guided mode
 #   bash install.sh --tool cursor            # install for a specific tool
 #   bash install.sh --tool all               # install for all tools
@@ -11,6 +15,35 @@
 #   bash install.sh --help                   # show usage
 
 set -e
+
+# ─── Bootstrap (supports: curl -fsSL .../install.sh | bash) ──────────────────
+#
+# When piped through curl there is no local skills/ tree.  Detect that, clone
+# the repo to a temp directory, and re-execute the real script from there.
+# The _TDD_BOOTSTRAPPED guard prevents infinite recursion.
+
+if [[ -z "${_TDD_BOOTSTRAPPED:-}" ]]; then
+  _self="${BASH_SOURCE[0]:-}"
+  if [[ -n "$_self" && "$_self" != "bash" ]]; then
+    _src_dir="$(cd "$(dirname "$_self")" && pwd)"
+  else
+    _src_dir=""
+  fi
+
+  if [[ -z "$_src_dir" ]] || [[ ! -d "$_src_dir/skills" ]]; then
+    if ! command -v git &>/dev/null; then
+      echo "  ✗ git is required but was not found. Install git and retry." >&2
+      exit 1
+    fi
+    _tmp="$(mktemp -d)"
+    trap 'rm -rf "$_tmp"' EXIT INT TERM
+    echo "  → Fetching tdd-agent-skills from GitHub…" >&2
+    git clone --depth=1 --quiet \
+      https://github.com/chenxingqiang/tdd-agent-skills.git "$_tmp/repo" >&2
+    export _TDD_BOOTSTRAPPED=1
+    exec bash "$_tmp/repo/install.sh" "$@"
+  fi
+fi
 
 # ─── Color helpers ───────────────────────────────────────────────────────────
 
@@ -55,7 +88,11 @@ usage() {
 
 ${BOLD}tdd-agent-skills installer${RESET}
 
-${BOLD}Usage:${RESET}
+${BOLD}Usage (curl — no clone needed):${RESET}
+  curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool cursor
+
+${BOLD}Usage (local clone):${RESET}
   bash install.sh [options]
 
 ${BOLD}Options:${RESET}
@@ -117,7 +154,7 @@ interactive_select_tools() {
   echo "    [$i] All tools"
   local all_idx=$i
   echo ""
-  read -r -p "  Enter number(s), comma-separated [1-$i]: " choice
+  read -r -p "  Enter number(s), comma-separated [1-$i]: " choice </dev/tty
   echo ""
 
   if [[ "$choice" == "$all_idx" ]]; then

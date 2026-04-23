@@ -62,12 +62,35 @@ Skills also activate automatically based on what you're doing — designing an A
 ### One-click install
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash
+```
+
+The installer fetches the repo automatically, then prompts you to choose a tool. Skip the prompt with `--tool`:
+
+```bash
+# Interactive (recommended — works with curl or a local clone)
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash
+
+# Non-interactive — pick a tool directly
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool cursor
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool windsurf
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool gemini
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool copilot
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool opencode
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool kiro
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool claude
+curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool all
+```
+
+Or clone first and run locally:
+
+```bash
 git clone https://github.com/chenxingqiang/tdd-agent-skills.git
 cd tdd-agent-skills
 bash install.sh
 ```
 
-The installer prompts you to choose a tool and configures everything automatically. Skip the prompt with `--tool`:
+The `--tool` flag table:
 
 | Flag | Installs for |
 |------|-------------|
