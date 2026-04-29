@@ -8,6 +8,7 @@ Specialist personas that play a single role with a single perspective. Each pers
 | [security-auditor](security-auditor.md) | Security Engineer | Vulnerability detection, OWASP-style audit |
 | [test-engineer](test-engineer.md) | QA Engineer | Test strategy, coverage analysis, Prove-It pattern |
 | [issue-curator](issue-curator.md) | Issue triage specialist | Merge code findings + user reports into tracker-ready issues |
+| [ontology-builder](ontology-builder.md) | Knowledge-structure specialist | Project concepts, relations, vocabulary, and code traceability |
 
 ## How personas relate to skills and commands
 
@@ -30,6 +31,7 @@ Pick this when you want one perspective on the current change and the user is in
 - "Are there security issues in `auth.ts`?" → invoke `security-auditor` directly
 - "What tests are missing for the checkout flow?" → invoke `test-engineer` directly
 - "Turn these bugs and what I described into GitHub issues" → invoke `issue-curator` directly
+- "What are the core domain concepts and how do they map to this repo?" → invoke `ontology-builder` directly
 
 ### Slash command (single persona behind it)
 Pick this when there's a repeatable workflow you'd otherwise re-explain every time.
@@ -106,7 +108,7 @@ Why this fails:
 
 The personas in this repo are designed to work as Claude Code subagents and as Agent Teams teammates without modification:
 
-- **As subagents:** auto-discovered when this plugin is enabled (no path config needed). Use the Agent tool with `subagent_type: code-reviewer` (or `security-auditor`, `test-engineer`, `issue-curator`). `/ship` is the canonical example.
+- **As subagents:** auto-discovered when this plugin is enabled (no path config needed). Use the Agent tool with `subagent_type: code-reviewer` (or `security-auditor`, `test-engineer`, `issue-curator`, `ontology-builder`). `/ship` is the canonical example.
 - **As Agent Teams teammates** (experimental, requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`): reference the same persona name when spawning a teammate. The persona's body is **appended to** the teammate's system prompt as additional instructions (not a replacement), so your persona text sits on top of the team-coordination instructions the lead installs (SendMessage, task-list tools, etc.).
 
 Subagents only report results back to the main agent. Agent Teams let teammates message each other directly. Use subagents when reports are enough; use Agent Teams when sub-agents need to challenge each other's findings (e.g. competing-hypothesis debugging). See [references/orchestration-patterns.md](../references/orchestration-patterns.md) for the full mapping.
