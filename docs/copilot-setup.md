@@ -8,7 +8,7 @@
 curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool copilot
 ```
 
-This copies all 20 skills to `.github/skills/`, all agent personas to `.github/agents/`, and creates `.github/copilot-instructions.md` if it does not already exist.
+This copies all skills to `.github/skills/`, all agent personas to `.github/agents/`, and creates `.github/copilot-instructions.md` if it does not already exist.
 
 **Install into a specific project:**
 
@@ -95,3 +95,16 @@ Use the agents for targeted review workflows in Copilot Chat.
 2. **Use agents for review** — The code-reviewer, test-engineer, and security-auditor agents are designed for Copilot's agent model.
 3. **Reference in chat** — When working on a specific phase, paste the relevant skill content into Copilot Chat for context.
 4. **Combine with PR reviews** — Set up Copilot to review PRs using the code-reviewer agent persona.
+
+---
+
+## Running under OpenAI Symphony
+
+When this tool is launched by [Symphony](https://github.com/openai/symphony) (autonomous tracker-driven runs spawned per Linear issue inside an isolated workspace), the agent's contract is the repo-owned [`WORKFLOW.md`](../WORKFLOW.md) at the project root. That file pins the same four-phase TDD protocol for every runtime, so behavior is identical regardless of which AI coding tool actually executes the turn.
+
+Two integration paths:
+
+1. **Direct mode** — point Symphony's `codex.command` at the tool's headless/CLI entry point if it already speaks the Codex app-server protocol over stdio.
+2. **Adapter mode** — wrap the tool in a thin app-server shim that emits `session_started`, `turn_completed`, token usage, and approval/tool-call events. See the runner table and adapter checklist in [`references/symphony-spec.md`](../references/symphony-spec.md).
+
+Either way, this tool's skills (installed above) plus `WORKFLOW.md` give you the full tdd-agent-skills lifecycle inside Symphony's autonomous runs. Read [`skills/symphony-orchestration/SKILL.md`](../skills/symphony-orchestration/SKILL.md) before authoring or auditing `WORKFLOW.md`.

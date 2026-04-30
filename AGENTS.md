@@ -58,6 +58,8 @@ These rules are non-negotiable in every phase and every tool:
 
 8. **Real-System Validation** — Validate against the actual target system or a strictly identical environment. If real-system validation is not feasible, document why, provide a validation plan, and obtain human approval before proceeding with any alternative.
 
+9. **Autonomous Run Discipline (Symphony)** — When the run was launched by [OpenAI Symphony](https://github.com/openai/symphony) inside a per-issue workspace, follow `skills/symphony-orchestration/SKILL.md`: declare the phase tag on the first line of every turn, never write outside the per-issue workspace, perform tracker writes yourself (Symphony does not), use continuation-guidance only on continuation turns, and complete the Production-Readiness Checklist before declaring success. The repo's canonical Symphony contract is `WORKFLOW.md` at the root.
+
 ---
 
 ## OpenCode Integration
@@ -82,6 +84,7 @@ The agent should automatically map user intent to skills:
 - Refactoring / simplification → `code-simplification`
 - API or interface design → `api-and-interface-design`
 - UI work → `frontend-ui-engineering`
+- Symphony autonomous run / `WORKFLOW.md` / per-issue workspace / Linear-driven dispatch → `symphony-orchestration`
 
 ### Lifecycle Mapping (Implicit Commands)
 
@@ -95,6 +98,7 @@ Instead, the agent must internally follow this lifecycle:
 - VERIFY → `debugging-and-error-recovery`
 - REVIEW → `code-review-and-quality`
 - SHIP → `shipping-and-launch`
+- ORCHESTRATE (autonomous, tracker-driven) → `symphony-orchestration`
 
 ### Execution Model
 

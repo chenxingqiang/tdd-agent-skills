@@ -8,9 +8,11 @@ This is the tdd-agent-skills project — a collection of production-grade Test-D
 skills/       → Core skills (SKILL.md per directory)
 agents/       → Reusable agent personas (code-reviewer, test-engineer, security-auditor)
 hooks/        → Session lifecycle hooks
-.claude/commands/ → Slash commands (/spec, /plan, /build, /test, /review, /code-simplify, /ship)
-references/   → Supplementary checklists (testing, performance, security, accessibility)
+.claude/commands/ → Slash commands (/spec, /plan, /build, /test, /review, /code-simplify, /ship, /symphony)
+references/   → Supplementary checklists (testing, performance, security, accessibility, symphony-spec)
 docs/         → Setup guides for different tools
+WORKFLOW.md   → OpenAI Symphony orchestrator contract (per-issue runs)
+symphony/     → Vendored Symphony Elixir reference implementation (Apache-2.0)
 ```
 
 ## TDD Development Protocol Phases
@@ -41,7 +43,7 @@ Before any merge to `main` complete the 13-item Production-Readiness Checklist i
 **Build:** incremental-implementation, test-driven-development, context-engineering, source-driven-development, frontend-ui-engineering, api-and-interface-design
 **Verify:** browser-testing-with-devtools, debugging-and-error-recovery
 **Review:** code-review-and-quality, code-simplification, security-and-hardening, performance-optimization
-**Ship:** git-workflow-and-versioning, ci-cd-and-automation, deprecation-and-migration, documentation-and-adrs, shipping-and-launch
+**Ship:** git-workflow-and-versioning, ci-cd-and-automation, deprecation-and-migration, documentation-and-adrs, shipping-and-launch, symphony-orchestration
 
 ## Conventions
 

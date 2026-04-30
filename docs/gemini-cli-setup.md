@@ -8,7 +8,7 @@
 curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool gemini
 ```
 
-This copies all 20 skills as `.md` files into `.gemini/skills/` in your current directory. Use `--global` to install to `~/.gemini/skills/` instead:
+This copies all skills as `.md` files into `.gemini/skills/` in your current directory. Use `--global` to install to `~/.gemini/skills/` instead:
 
 ```bash
 bash install.sh --tool gemini --global
@@ -123,3 +123,16 @@ This is useful when you want to ensure a specific workflow is followed without w
 2. **Skill descriptions matter** — Each SKILL.md has a `description` field in its frontmatter that tells agents when to activate it. The descriptions in this repo are optimized for auto-discovery across all supported tools (Claude Code, Gemini CLI, etc.) by clearly stating both *what* the skill does and *when* it should be triggered.
 3. **Use agents for review** — Copy `agents/code-reviewer.md` content when requesting structured code reviews.
 4. **Combine with references** — Reference checklists from `references/` when working on specific quality areas like testing or performance.
+
+---
+
+## Running under OpenAI Symphony
+
+When this tool is launched by [Symphony](https://github.com/openai/symphony) (autonomous tracker-driven runs spawned per Linear issue inside an isolated workspace), the agent's contract is the repo-owned [`WORKFLOW.md`](../WORKFLOW.md) at the project root. That file pins the same four-phase TDD protocol for every runtime, so behavior is identical regardless of which AI coding tool actually executes the turn.
+
+Two integration paths:
+
+1. **Direct mode** — point Symphony's `codex.command` at the tool's headless/CLI entry point if it already speaks the Codex app-server protocol over stdio.
+2. **Adapter mode** — wrap the tool in a thin app-server shim that emits `session_started`, `turn_completed`, token usage, and approval/tool-call events. See the runner table and adapter checklist in [`references/symphony-spec.md`](../references/symphony-spec.md).
+
+Either way, this tool's skills (installed above) plus `WORKFLOW.md` give you the full tdd-agent-skills lifecycle inside Symphony's autonomous runs. Read [`skills/symphony-orchestration/SKILL.md`](../skills/symphony-orchestration/SKILL.md) before authoring or auditing `WORKFLOW.md`.
