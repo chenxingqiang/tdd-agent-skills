@@ -8,7 +8,7 @@
 curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool kiro
 ```
 
-This copies all 20 skills as `.md` files into `.kiro/skills/` in your current directory. Kiro loads them automatically.
+This copies all skills as `.md` files into `.kiro/skills/` in your current directory. Kiro loads them automatically.
 
 **Install to a specific project:**
 
@@ -92,7 +92,7 @@ cp /path/to/tdd-agent-skills/AGENTS.md ./AGENTS.md
 
 ## Usage Tips
 
-1. **Don't load all 20 skills at once** — Kiro, like all LLM-based agents, works best with focused context. Load the 2-3 skills most relevant to your current phase.
+1. **Don't load all skills at once** — Kiro, like all LLM-based agents, works best with focused context. Load the 2-3 skills most relevant to your current phase.
 2. **Use `--global` for always-on skills** — Put your 3 essential skills in `~/.kiro/skills/` and project-specific skills in `.kiro/skills/`.
 3. **Reference skills explicitly** — Tell Kiro "Follow the test-driven-development skill for this change" to ensure it reads and applies the loaded skill.
 4. **Use agents for review** — Invoke the `code-reviewer` or `security-auditor` agent when you need a structured review perspective.
@@ -103,3 +103,16 @@ cp /path/to/tdd-agent-skills/AGENTS.md ./AGENTS.md
 - [Kiro skills documentation](https://kiro.dev/docs/skills/)
 - [tdd-agent-skills getting started guide](getting-started.md)
 - [Skill anatomy](skill-anatomy.md) — how each skill is structured
+
+---
+
+## Running under OpenAI Symphony
+
+When this tool is launched by [Symphony](https://github.com/openai/symphony) (autonomous tracker-driven runs spawned per Linear issue inside an isolated workspace), the agent's contract is the repo-owned [`WORKFLOW.md`](../WORKFLOW.md) at the project root. That file pins the same four-phase TDD protocol for every runtime, so behavior is identical regardless of which AI coding tool actually executes the turn.
+
+Two integration paths:
+
+1. **Direct mode** — point Symphony's `codex.command` at the tool's headless/CLI entry point if it already speaks the Codex app-server protocol over stdio.
+2. **Adapter mode** — wrap the tool in a thin app-server shim that emits `session_started`, `turn_completed`, token usage, and approval/tool-call events. See the runner table and adapter checklist in [`references/symphony-spec.md`](../references/symphony-spec.md).
+
+Either way, this tool's skills (installed above) plus `WORKFLOW.md` give you the full tdd-agent-skills lifecycle inside Symphony's autonomous runs. Read [`skills/symphony-orchestration/SKILL.md`](../skills/symphony-orchestration/SKILL.md) before authoring or auditing `WORKFLOW.md`.

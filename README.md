@@ -65,7 +65,7 @@ DESIGN ──▶ DEVELOPMENT ──▶ TESTING ──▶ VERIFICATION
 
 ## Commands
 
-7 slash commands that map to the development lifecycle. Each one activates the right skills automatically.
+8 slash commands that map to the development lifecycle. Each one activates the right skills automatically.
 
 | What you're doing | Command | Key principle |
 |-------------------|---------|---------------|
@@ -76,6 +76,7 @@ DESIGN ──▶ DEVELOPMENT ──▶ TESTING ──▶ VERIFICATION
 | Review before merge | `/review` | Improve code health |
 | Simplify the code | `/code-simplify` | Clarity over cleverness |
 | Ship to production | `/ship` | Faster is safer |
+| Run under Symphony | `/symphony` | Autonomous runs, four-phase TDD |
 
 Skills also activate automatically based on what you're doing — designing an API triggers `api-and-interface-design`, building UI triggers `frontend-ui-engineering`, and so on.
 
@@ -224,9 +225,24 @@ Skills are plain Markdown — paste any `SKILL.md` into a system prompt, rules f
 
 ---
 
-## All 20 Skills
+## Running Under OpenAI Symphony
 
-The commands above are the entry points. Under the hood, they activate these 20 skills — each one a structured workflow with steps, verification gates, and anti-rationalization tables. You can also reference any skill directly.
+[Symphony](https://github.com/openai/symphony) is OpenAI's autonomous-run orchestrator: it polls an issue tracker (Linear today) and spawns one coding-agent session per issue inside an isolated per-issue workspace. tdd-agent-skills ships a first-class Symphony integration so any runtime Symphony spawns — Codex, Claude Code, Cursor, Copilot, Gemini CLI, Windsurf, OpenCode, Kiro, Trae — runs the same four-phase TDD protocol with identical gates.
+
+| Artifact | Purpose |
+|----------|---------|
+| [`WORKFLOW.md`](WORKFLOW.md) | Repo-owned Symphony contract (SPEC §5). YAML front matter (`tracker`, `polling`, `workspace`, `hooks`, `agent`, `codex`) + Liquid prompt template that embeds the four-phase protocol. Edit freely — Symphony hot-reloads. |
+| [`skills/symphony-orchestration`](skills/symphony-orchestration/SKILL.md) | The runtime contract for agents: phase tags, the seven Symphony surfaces, continuation-turn discipline, tracker-write etiquette, ship gate. |
+| [`references/symphony-spec.md`](references/symphony-spec.md) | Full SPEC §1–§15 reference, per-tool runner table, adapter checklist, security guidance. |
+| [`/symphony`](.claude/commands/symphony.md) | Slash command for run / author / audit modes. |
+
+**Cross-tool consistency:** Symphony launches `bash -lc <codex.command>` in the workspace. Use the Codex CLI directly, or wrap any other runtime in a thin app-server adapter (see the runner table in `references/symphony-spec.md`). Because the *prompt* — `WORKFLOW.md` — is the same regardless of runtime, the four-phase protocol is preserved end-to-end.
+
+---
+
+## All Skills
+
+The commands above are the entry points. Under the hood, they activate these skills — each one a structured workflow with steps, verification gates, and anti-rationalization tables. You can also reference any skill directly.
 
 ### Define - Clarify what to build
 
@@ -277,6 +293,7 @@ The commands above are the entry points. Under the hood, they activate these 20 
 | [deprecation-and-migration](skills/deprecation-and-migration/SKILL.md) | Code-as-liability mindset, compulsory vs advisory deprecation, migration patterns, zombie code removal | Removing old systems, migrating users, or sunsetting features |
 | [documentation-and-adrs](skills/documentation-and-adrs/SKILL.md) | Architecture Decision Records, API docs, inline documentation standards - document the *why* | Making architectural decisions, changing APIs, or shipping features |
 | [shipping-and-launch](skills/shipping-and-launch/SKILL.md) | Pre-launch checklists, feature flag lifecycle, staged rollouts, rollback procedures, monitoring setup | Preparing to deploy to production |
+| [symphony-orchestration](skills/symphony-orchestration/SKILL.md) | Maps OpenAI Symphony SPEC §1–§15 onto the four-phase TDD protocol, governs autonomous tracker-driven runs, owns the repo's `WORKFLOW.md` contract | Run was launched by Symphony, editing `WORKFLOW.md`, or driving work from a Linear issue |
 
 ---
 
@@ -302,6 +319,7 @@ Quick-reference material that skills pull in when needed:
 | [security-checklist.md](references/security-checklist.md) | Pre-commit checks, auth, input validation, headers, CORS, OWASP Top 10 |
 | [performance-checklist.md](references/performance-checklist.md) | Core Web Vitals targets, frontend/backend checklists, measurement commands |
 | [accessibility-checklist.md](references/accessibility-checklist.md) | Keyboard nav, screen readers, visual design, ARIA, testing tools |
+| [symphony-spec.md](references/symphony-spec.md) | OpenAI Symphony SPEC §1–§15 mapping, cross-tool runner table, adapter checklist |
 
 ---
 
@@ -341,7 +359,8 @@ Every skill follows a consistent anatomy:
 ```
 tdd-agent-skills/
 ├── install.sh                         # One-click installer for all tools
-├── skills/                            # 20 core skills (SKILL.md per directory)
+├── WORKFLOW.md                        # OpenAI Symphony orchestrator contract
+├── skills/                            # core skills (SKILL.md per directory)
 │   ├── idea-refine/                   #   Define
 │   ├── spec-driven-development/       #   Define
 │   ├── planning-and-task-breakdown/   #   Plan
@@ -362,11 +381,12 @@ tdd-agent-skills/
 │   ├── deprecation-and-migration/     #   Ship
 │   ├── documentation-and-adrs/        #   Ship
 │   ├── shipping-and-launch/           #   Ship
+│   ├── symphony-orchestration/        #   Ship (autonomous runs)
 │   └── using-agent-skills/            #   Meta: how to use this pack
 ├── agents/                            # 3 specialist personas
-├── references/                        # 4 supplementary checklists
+├── references/                        # supplementary checklists + symphony-spec.md
 ├── hooks/                             # Session lifecycle hooks
-├── .claude/commands/                  # 7 slash commands
+├── .claude/commands/                  # 8 slash commands (incl. /symphony)
 └── docs/                              # Setup guides per tool
 ```
 

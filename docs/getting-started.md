@@ -175,3 +175,11 @@ The `/spec` and `/plan` commands create working artifacts (`SPEC.md`, `tasks/pla
 3. **Don't skip verification steps** — they're the whole point
 4. **Load skills selectively** — more context isn't always better
 5. **Use the agents for review** — different perspectives catch different issues
+
+---
+
+## Running Autonomously Under OpenAI Symphony
+
+If the run is launched by [OpenAI Symphony](https://github.com/openai/symphony) (autonomous tracker-driven dispatch, one coding-agent session per Linear issue inside an isolated workspace), the same four-phase protocol applies — but the contract surface is the repo-owned [`WORKFLOW.md`](../WORKFLOW.md) at the project root, and the agent owns tracker writes (state transitions, comments, PR links) because Symphony does not.
+
+Read [`skills/symphony-orchestration/SKILL.md`](../skills/symphony-orchestration/SKILL.md) and the SPEC mapping in [`references/symphony-spec.md`](../references/symphony-spec.md) before authoring or running under `WORKFLOW.md`.
