@@ -12,6 +12,7 @@ hooks/        → Session lifecycle hooks
 references/   → Supplementary checklists (testing, performance, security, accessibility, symphony-spec)
 docs/         → Setup guides for different tools
 WORKFLOW.md   → OpenAI Symphony orchestrator contract (per-issue runs)
+symphony/     → Vendored Symphony Elixir reference implementation (Apache-2.0)
 ```
 
 ## TDD Development Protocol Phases

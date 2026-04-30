@@ -254,5 +254,8 @@ For changes to `WORKFLOW.md` itself:
   `shipping-and-launch` — the skills you walk through on every Symphony run.
 - `security-and-hardening` — for tightening approval/sandbox posture
   beyond defaults.
+- **Vendored Elixir reference impl:** [`symphony/elixir/`](../../symphony/elixir/)
+  with [vendoring policy](../../symphony/README.md) and
+  [operator quickstart](../../docs/symphony-elixir-quickstart.md).
 - OpenAI Symphony SPEC v1: <https://github.com/openai/symphony/blob/main/SPEC.md>
 - OpenAI Codex app-server: <https://developers.openai.com/codex/app-server/>

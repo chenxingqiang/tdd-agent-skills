@@ -232,6 +232,8 @@ Skills are plain Markdown — paste any `SKILL.md` into a system prompt, rules f
 | Artifact | Purpose |
 |----------|---------|
 | [`WORKFLOW.md`](WORKFLOW.md) | Repo-owned Symphony contract (SPEC §5). YAML front matter (`tracker`, `polling`, `workspace`, `hooks`, `agent`, `codex`) + Liquid prompt template that embeds the four-phase protocol. Edit freely — Symphony hot-reloads. |
+| [`symphony/elixir/`](symphony/elixir/) | **Vendored Symphony Elixir reference implementation** (Apache‑2.0, pinned to upstream [`58cf97d`](https://github.com/openai/symphony/commit/58cf97da06d556c019ccea20c67f4f77da124bf3)). Run with `cd symphony/elixir && mise install && mix setup && mix build && ./bin/symphony ../../WORKFLOW.md`. See [`symphony/README.md`](symphony/README.md) for vendoring policy. |
+| [`docs/symphony-elixir-quickstart.md`](docs/symphony-elixir-quickstart.md) | Operator quickstart — provision toolchain, configure tracker, smoke-test, enable Phoenix dashboard. |
 | [`skills/symphony-orchestration`](skills/symphony-orchestration/SKILL.md) | The runtime contract for agents: phase tags, the seven Symphony surfaces, continuation-turn discipline, tracker-write etiquette, ship gate. |
 | [`references/symphony-spec.md`](references/symphony-spec.md) | Full SPEC §1–§15 reference, per-tool runner table, adapter checklist, security guidance. |
 | [`/symphony`](.claude/commands/symphony.md) | Slash command for run / author / audit modes. |
@@ -360,6 +362,11 @@ Every skill follows a consistent anatomy:
 tdd-agent-skills/
 ├── install.sh                         # One-click installer for all tools
 ├── WORKFLOW.md                        # OpenAI Symphony orchestrator contract
+├── symphony/                          # Vendored Symphony Elixir reference impl (Apache-2.0)
+│   ├── README.md                      #   Vendoring policy + provenance
+│   ├── LICENSE                        #   Apache 2.0 (upstream)
+│   ├── NOTICE                         #   Apache 2.0 attribution (upstream)
+│   └── elixir/                        #   Upstream openai/symphony elixir/ tree, unmodified
 ├── skills/                            # core skills (SKILL.md per directory)
 │   ├── idea-refine/                   #   Define
 │   ├── spec-driven-development/       #   Define

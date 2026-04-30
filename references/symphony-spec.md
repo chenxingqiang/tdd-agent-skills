@@ -397,22 +397,27 @@ the consistency guarantee.
 
 ## 11. Bringing Symphony Up (operator quickstart)
 
-> Use this as a sanity-check checklist when wiring Symphony into a project.
-> Detailed setup lives in OpenAI's reference Elixir implementation — see
-> the upstream repo's `elixir/README.md`.
+> The fastest path is the **vendored Elixir reference implementation** at
+> [`symphony/elixir/`](../symphony/elixir/). See
+> [`docs/symphony-elixir-quickstart.md`](../docs/symphony-elixir-quickstart.md)
+> for a full operator walkthrough.
 
-1. **Install Symphony** per the upstream README. This repo does not
-   redistribute Symphony.
-2. **Adopt** `WORKFLOW.md` from this repo's root into your target project
-   (or use this repo as the workspace itself).
+1. **Install Symphony** — either use the vendored Elixir reference impl
+   (`cd symphony/elixir && mise install && mix setup && mix build`) or
+   install upstream per its README. This repo redistributes the Elixir
+   reference impl unchanged at pinned commit
+   [`58cf97d`](https://github.com/openai/symphony/commit/58cf97da06d556c019ccea20c67f4f77da124bf3)
+   (Apache-2.0).
+2. **Adopt** [`WORKFLOW.md`](../WORKFLOW.md) at the repo root as your
+   Symphony contract (or use this repo as the workspace itself).
 3. **Set credentials.** Export `LINEAR_API_KEY`. Authenticate the Codex
    CLI (or your adapter's runtime).
 4. **Pick a workspace root.** Keep it on a fast local disk. Do not place
    it inside the repo you are editing.
 5. **Tighten approval/sandbox.** The defaults in `WORKFLOW.md` assume a
    trusted environment. For untrusted issues, narrow them per SPEC §15.5.
-6. **Boot Symphony** with the `--port` flag to enable the OPTIONAL JSON
-   API on loopback for monitoring.
+6. **Boot Symphony** with `--port 4000` to enable the OPTIONAL JSON API
+   on loopback for monitoring (`./bin/symphony ../../WORKFLOW.md --port 4000`).
 7. **Open one issue** in the target Linear project as a smoke test before
    enabling broad dispatch.
 8. **Watch the dashboard / `GET /api/v1/state`** for `running`, `retrying`,
@@ -429,6 +434,7 @@ SPEC §4.1.1.
 
 - Symphony SPEC v1: <https://github.com/openai/symphony/blob/main/SPEC.md>
 - Symphony repo (reference Elixir implementation): <https://github.com/openai/symphony>
+- **Vendored Elixir impl in this repo:** [`symphony/elixir/`](../symphony/elixir/) ([vendoring policy](../symphony/README.md), [operator quickstart](../docs/symphony-elixir-quickstart.md))
 - OpenAI Codex app-server: <https://developers.openai.com/codex/app-server/>
 - Harness engineering: <https://openai.com/index/harness-engineering/>
 - This repo's canonical `WORKFLOW.md`: <../WORKFLOW.md>
