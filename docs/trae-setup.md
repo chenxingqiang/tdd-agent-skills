@@ -1,5 +1,31 @@
 # Using tdd-agent-skills with Trae
 
+## How Trae loads rules (read this first)
+
+Trae auto-loads exactly one file: **`.trae/rules/project_rules.md`** (a single
+plain markdown file, no frontmatter). Earlier versions of this guide suggested
+copying every skill into `.trae/rules/` as separate files — that doesn't work,
+those files are silently ignored by Trae.
+
+The installer now writes:
+
+```
+.trae/
+├── rules/
+│   └── project_rules.md   # auto-loaded by Trae — bootstraps everything
+├── Skills/
+│   └── <skill-name>/
+│       └── SKILL.md       # full skill bodies, loaded on demand by path reference
+└── agents/
+    └── <persona>.md       # specialist personas, loaded on demand by path reference
+```
+
+`project_rules.md` contains `AGENTS.md` (the universal rules) plus an index of
+every skill and agent with their file paths. When you ask Trae to do something
+("write a spec", "TDD this bug fix", "review this PR"), Trae reads the index in
+`project_rules.md`, then opens the matching skill or persona file on demand.
+This keeps Trae's context small while still giving it the full toolkit.
+
 ## Setup
 
 ### One-click install
@@ -8,92 +34,85 @@
 curl -fsSL https://raw.githubusercontent.com/chenxingqiang/tdd-agent-skills/main/install.sh | bash -s -- --tool trae
 ```
 
-This copies all skills as `.md` files into `.trae/rules/` in your current directory. Trae loads them automatically.
-
 **Install into a specific project:**
 
 ```bash
 bash install.sh --tool trae --target ~/my-project
 ```
 
-**Install to global user config:**
+This also drops `AGENTS.md` at the project root for tools that read it directly.
+
+**Install to your global user config:**
 
 ```bash
 bash install.sh --tool trae --global
 ```
 
-The `--global` flag installs skills to `~/.trae/rules/` so they are available in every project.
+Writes to `~/.trae/` so the rules apply in every project. (Note: Trae's user
+rules normally live in IDE settings rather than the filesystem, so this path
+is most useful when you're invoking Trae's CLI from arbitrary directories.)
 
 ### Manual install
 
 ```bash
-# Create the rules directory
-mkdir -p .trae/rules
+mkdir -p .trae/rules .trae/Skills .trae/agents
 
-# Copy individual skills
-cp /path/to/tdd-agent-skills/skills/test-driven-development/SKILL.md .trae/rules/test-driven-development.md
-cp /path/to/tdd-agent-skills/skills/incremental-implementation/SKILL.md .trae/rules/incremental-implementation.md
-cp /path/to/tdd-agent-skills/skills/code-review-and-quality/SKILL.md .trae/rules/code-review-and-quality.md
+# 1. The auto-loaded rules file. Start with AGENTS.md as the seed.
+cp /path/to/tdd-agent-skills/AGENTS.md .trae/rules/project_rules.md
+
+# 2. Full skills (referenced from project_rules.md, loaded on demand).
+cp -r /path/to/tdd-agent-skills/skills/* .trae/Skills/
+
+# 3. Agent personas (referenced from project_rules.md, loaded on demand).
+cp /path/to/tdd-agent-skills/agents/*.md .trae/agents/
 ```
 
-Skills are plain Markdown files. Trae discovers them automatically from `.trae/rules/` — no extra configuration required.
+After copying, append a skill index to `project_rules.md` so Trae knows where
+to look — or just run the installer, which does this for you.
 
 ## Recommended Configuration
 
-### Essential skills (always load)
+The installer copies all skills and agents. You don't need to hand-pick a
+subset because they're loaded on demand — Trae reads only the skill files
+relevant to the current task.
 
-Copy these three into `.trae/rules/`:
+If you want to slim things down anyway (slower IDE indexing, smaller repo
+footprint), keep these three skills minimum:
 
-1. `test-driven-development.md` — Red-Green-Refactor, test pyramid, Prove-It pattern
-2. `incremental-implementation.md` — Thin vertical slices, feature flags, rollback-friendly changes
-3. `code-review-and-quality.md` — Five-axis review before merge
-
-### Phase-specific skills (load as needed)
-
-Copy additional skills into `.trae/rules/` based on your current work:
-
-| Task | Skill |
-|------|-------|
-| Starting a new feature | `spec-driven-development.md` |
-| Breaking down a spec | `planning-and-task-breakdown.md` |
-| Building UI | `frontend-ui-engineering.md` |
-| Designing an API | `api-and-interface-design.md` |
-| Debugging | `debugging-and-error-recovery.md` |
-| Security review | `security-and-hardening.md` |
-| Performance work | `performance-optimization.md` |
-| Deploying | `shipping-and-launch.md` |
+1. `test-driven-development` — Red-Green-Refactor, test pyramid, Prove-It pattern
+2. `incremental-implementation` — Thin vertical slices, feature flags
+3. `code-review-and-quality` — Five-axis review before merge
 
 ## Agent Personas
 
-Copy the specialist agent personas into your project's rules directory so Trae can apply them during reviews:
-
-```bash
-mkdir -p .trae/rules
-cp /path/to/tdd-agent-skills/agents/code-reviewer.md .trae/rules/
-cp /path/to/tdd-agent-skills/agents/test-engineer.md .trae/rules/
-cp /path/to/tdd-agent-skills/agents/security-auditor.md .trae/rules/
-```
+The installer copies all personas under `.trae/agents/`:
 
 | Agent | Role | Best for |
 |-------|------|----------|
 | `code-reviewer` | Senior Staff Engineer | Five-axis review before merge |
 | `test-engineer` | QA Engineer | Test strategy, coverage analysis |
 | `security-auditor` | Security Engineer | Vulnerability detection, OWASP audit |
+| `tdd-pr-reviewer` | TDD discipline reviewer | Verifying RED-before-GREEN, phase tags |
+| `issue-curator` | Issue triage | Cleaning up backlogs |
+| `ontology-builder` | Domain modeling | Concept maps, glossaries |
 
-## AGENTS.md
-
-Copy `AGENTS.md` to your project root so Trae's AI agent respects the TDD Development Protocol, four-phase workflow, and universal agent rules:
-
-```bash
-cp /path/to/tdd-agent-skills/AGENTS.md ./AGENTS.md
-```
+Trae has no filesystem-level "agent" registration (its built-in agents are
+GUI-managed), so these personas are read on demand the same way skills are:
+ask Trae to "review this PR using `code-reviewer`" and it will open
+`.trae/agents/code-reviewer.md` first.
 
 ## Usage Tips
 
-1. **Don't load all skills at once** — Trae's context window is limited. Load the 2-3 skills most relevant to your current phase.
-2. **Reference skills explicitly** — Tell Trae "Follow the test-driven-development rules for this change" to ensure it reads and applies the loaded skill.
-3. **Use agents for review** — Invoke the `code-reviewer` or `security-auditor` persona when you need a structured review perspective.
-4. **Combine with references** — The `references/` directory contains supplementary checklists (`testing-patterns.md`, `security-checklist.md`, etc.) that complement the skills. Paste relevant checklists into your session when working on specific quality areas.
+1. **Reference skills explicitly.** Tell Trae "follow `test-driven-development`"
+   instead of "be careful with tests" — the explicit name triggers the
+   skill-index lookup.
+2. **One persona at a time.** Loading multiple personas in one turn dilutes
+   their voice. Pick the one that matches the task.
+3. **Combine with references.** `references/testing-patterns.md`,
+   `references/security-checklist.md`, etc. complement the skills. Paste the
+   relevant checklist into your session when working on quality-specific work.
+4. **Re-run the installer** after pulling updates — it overwrites
+   `project_rules.md` with the latest skill/agent index.
 
 ## Further Reading
 
