@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# tdd-session — bracket an agent's work in a Supabase `sessions` row so
+# `agent_turns` can FK to it without the agent juggling UUIDs.
+#
+# Usage:
+#   eval "$(tdd-session start --issue TDD-1)"   # exports TDD_SESSION_ID
+#   ... agent does work, calls `tdd-cli turn-log --session "$TDD_SESSION_ID" ...`
+#   tdd-session end                             # uses TDD_SESSION_ID
+set -euo pipefail
+
+CLI="$(dirname "$0")/tdd-cli"
+
+case "${1:-}" in
+  start)
+    shift
+    SID="$("$CLI" session-start "$@")"
+    # printable so callers can `eval` it
+    printf 'export TDD_SESSION_ID=%q\n' "$SID"
+    printf 'echo "[tdd-session] started %s" >&2\n' "$SID"
+    ;;
+  end)
+    shift
+    : "${TDD_SESSION_ID:?TDD_SESSION_ID not set — was the session started?}"
+    "$CLI" session-end --session "$TDD_SESSION_ID" "$@"
+    ;;
+  *)
+    cat <<EOF
+usage:
+  eval "\$($0 start [--issue TDD-1] [--agent UUID])"
+  $0 end [--status done|aborted]
+EOF
+    exit 64
+    ;;
+esac

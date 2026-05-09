@@ -17,9 +17,9 @@ and [`references/symphony-spec.md`](../references/symphony-spec.md) first.
 | Dependency | Purpose | Recommended install |
 |------------|---------|---------------------|
 | [mise](https://mise.jdx.dev/) | Pins the Erlang/Elixir versions used by Symphony (`symphony/elixir/mise.toml`) | `curl https://mise.run \| sh` |
-| Linear personal API key | Tracker auth (SPEC §11.2). Settings → Security & access → Personal API keys | `export LINEAR_API_KEY=lin_api_...` |
+| Linear personal API key **OR** Supabase project | Tracker auth. Linear → Settings → Security & access → Personal API keys. Supabase → Project Settings → API → `service_role` key. | `export LINEAR_API_KEY=...` or `export SUPABASE_SERVICE_ROLE_KEY=...` |
 | OpenAI Codex CLI | Default `codex.command` runtime. See <https://developers.openai.com/codex/app-server/> | per Codex docs |
-| Linear project slug | The slug segment of your project's URL (e.g. `api-platform-d8ac9c6f0a3b`) | from Linear UI |
+| Linear project slug (Linear only) | The slug segment of your project's URL (e.g. `api-platform-d8ac9c6f0a3b`) | from Linear UI |
 
 ## 1. Configure the workflow
 
@@ -27,11 +27,33 @@ The repo root [`WORKFLOW.md`](../WORKFLOW.md) is the contract Symphony
 will execute. **Edit only that file** — never the upstream sample at
 `symphony/elixir/WORKFLOW.md`.
 
-Required edits:
+### For Linear
 
 ```yaml
 tracker:
-  project_slug: <your-linear-project-slug>   # SPEC §11.2
+  kind: linear
+  endpoint: https://api.linear.app/graphql
+  api_key: $LINEAR_API_KEY
+  project_slug: <your-linear-project-slug>
+```
+
+### For Supabase (zero new deps — uses existing `req` HTTP client)
+
+1. Create a free Supabase project at <https://supabase.com>.
+2. Run the schema at [`symphony/supabase_schema.sql`](../symphony/supabase_schema.sql)
+   in the Supabase SQL Editor.
+3. Copy the `service_role` key from Project Settings → API.
+
+```yaml
+tracker:
+  kind: supabase
+  endpoint: https://<your-project>.supabase.co
+  api_key: $SUPABASE_SERVICE_ROLE_KEY
+```
+
+### Common (both trackers)
+
+```yaml
 workspace:
   root: ~/symphony_workspaces                 # local fast disk recommended
 hooks:
@@ -39,7 +61,7 @@ hooks:
     git clone git@github.com:your-org/your-repo.git .
 ```
 
-Keep `tracker.api_key: $LINEAR_API_KEY` as `$VAR` indirection (SPEC §15.3).
+Keep `tracker.api_key` as `$VAR` indirection (SPEC §15.3).
 Tighten `codex.approval_policy` / `thread_sandbox` / `turn_sandbox_policy`
 for untrusted environments per SPEC §15.5.
 

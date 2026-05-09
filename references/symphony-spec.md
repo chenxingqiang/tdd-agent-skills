@@ -267,6 +267,17 @@ Targeted-protocol completion → success; failure/cancellation → failure;
 - Normalization: `labels` lowercased; `blocked_by` from inverse `blocks`
   relations; `priority` integer-or-null; ISO-8601 timestamps.
 
+### Supabase specifics (`tracker.kind == "supabase"`)
+
+- Uses PostgREST REST API (no GraphQL). No new dependencies — reuses the
+  existing `req` HTTP client.
+- `endpoint` is the Supabase project URL (e.g. `https://xxx.supabase.co`).
+- `api_key` is the `service_role` key (env: `SUPABASE_SERVICE_ROLE_KEY`).
+- Database schema: [`symphony/supabase_schema.sql`](../symphony/supabase_schema.sql).
+- `blocked_by` stored as JSONB; `labels` as PostgreSQL text array.
+- Pagination via HTTP `Range` headers (RFC 7233). Page size default 50.
+- Write operations (POST/PATCH) return minimal responses (`Prefer: return=minimal`).
+
 ### Error categories
 
 `unsupported_tracker_kind`, `missing_tracker_api_key`,

@@ -191,6 +191,111 @@ the *prompt* — `WORKFLOW.md` — is the same. That is the integration point.
 6. **Run the ship gate.** No success declaration without the 13-item
    Production-Readiness Checklist.
 
+## Driver Mode (Claude Code as the orchestrator)
+
+When the user invokes `/symphony` with no Symphony runtime present —
+i.e., **Claude Code itself plays the scheduler** — run the loop natively.
+No Elixir, no Codex shim, no subprocess: one Claude session walks every
+issue. Trade-off: serial (one issue at a time), no crash-resilience, no
+multi-worker scaling. Acceptable for small queues, demos, and single-dev
+projects; reach for the vendored Elixir runtime when you need parallelism
+or durability.
+
+### When to use Driver mode
+
+- The user says "run Symphony", "process the queue", "drive the tracker",
+  or `/symphony` with no live Elixir runtime.
+- The repo has `WORKFLOW.md` at the root and a reachable tracker (Linear
+  GraphQL or Supabase PostgREST).
+- The user accepts that Claude itself is the loop (visible turn-by-turn,
+  stoppable with Ctrl-C, no parallelism).
+
+### Driver loop
+
+The phase tag for the *driver itself* (between issues) is `[DESIGN]` —
+you are scheduling, not coding. Each per-issue inner walk re-tags as it
+enters DEFINE/PLAN/BUILD/etc.
+
+1. **Boot.** Read `WORKFLOW.md` from repo root. Parse `tracker.kind`,
+   `tracker.endpoint`, `tracker.api_key` (resolve `$VAR`), `tracker.active_states`,
+   `workspace.root`, `agent.max_turns`. Refuse to run if any are missing
+   or if literal secrets are inlined.
+2. **Poll for next issue.** Query the tracker for issues whose state ∈
+   `active_states`, ordered by `priority asc, created_at asc`, limit 1.
+   - **Supabase**: `GET {endpoint}/rest/v1/issues?state=in.(Todo,...)&order=priority.asc.nullslast,created_at.asc&limit=1`
+     with headers `apikey`, `Authorization: Bearer ...`.
+   - **Linear**: GraphQL `issues(filter:{state:{name:{in:[...]}}})` —
+     one operation per call.
+   - If empty, exit cleanly with a summary. Do not busy-poll.
+3. **Claim.** Transition the issue's state to the project's "in progress"
+   label (commonly `In Progress`) via PATCH/mutation. Post a comment:
+   `Symphony driver claimed at <ISO ts> — Claude Code session <session_id>`.
+   Stop the run if the claim fails (another worker may hold it).
+4. **Create or reconcile workspace.** Path = `{workspace.root}/{sanitized_id}`.
+   If it doesn't exist: `git worktree add` from `main` (preferred) or
+   `mkdir + git init`. If it does: respect SPEC §9.1 (no auto-delete),
+   read prior state and continue.
+5. **`cd` into the workspace** and run the per-issue inner walk:
+   - `[DESIGN]` — `spec-driven-development` → write `SPEC.md`, commit.
+   - `[DEVELOPMENT]` — `planning-and-task-breakdown` then
+     `incremental-implementation` + `test-driven-development` (RED →
+     GREEN → REFACTOR per task). Commit after each green.
+   - `[TESTING]` — `test-driven-development` Testing Phase Independence:
+     run the suite, report results, do not edit code.
+   - `[VERIFICATION]` — `debugging-and-error-recovery` if red; otherwise
+     proceed. Get human sign-off only if a *design* change is needed.
+   - `[REVIEW]` — `code-review-and-quality` self-review.
+   - **Ship gate** — `shipping-and-launch` 13-item checklist. Record each
+     item as a tracker comment with evidence link.
+
+   When the project ships `bin/tdd-cli` (Postgres-trigger-enforced TDD),
+   prefer it over raw `git commit` for phase boundaries:
+   `tdd-cli claim --issue X`, `tdd-cli spec`, `tdd-cli red`, `tdd-cli green`,
+   `tdd-cli refactor`, `tdd-cli check`, `tdd-cli open-pr`, `tdd-cli merge`.
+   The triggers reject out-of-order phase transitions, so they double as
+   self-enforcement of the four-phase protocol.
+6. **Hand off.** Open a PR (`git-workflow-and-versioning`), then transition
+   the issue to the team's handoff state (commonly `Human Review`). Post a
+   final comment with PR URL + checklist summary.
+7. **Loop.** Return to step 2. Stop conditions:
+   - No active issues remain.
+   - User interrupts (Ctrl-C / explicit stop).
+   - A Universal Agent Rule was about to be violated — stop and leave a
+     handoff comment on the current issue.
+   - You hit `agent.max_turns`-equivalent work without convergence: post
+     a `[blocked]` comment, transition to `Needs Human` (or back to
+     `Todo`), and continue to the next issue.
+
+### Driver invariants
+
+- One issue at a time. Never claim a second before the first reaches a
+  terminal or handoff state.
+- `cd` discipline: every shell command after step 5 runs inside the
+  per-issue workspace. Verify with `pwd` after any tool that might reset
+  cwd.
+- Tracker writes are the *only* cross-issue state. Do not keep an
+  in-memory queue snapshot — re-poll every iteration so external edits
+  (humans reprioritizing, blocking, closing) take effect immediately.
+- Secrets stay in env. Never echo `$LINEAR_API_KEY` or `$SUPABASE_KEY`
+  into logs, commit messages, comments, or the conversation transcript.
+- Resume-safety: if the driver is restarted mid-issue, on next boot the
+  in-progress issue should be detected (state ≠ active_states but ≠
+  terminal) and either resumed or handed off — do not silently re-claim.
+
+### Driver red flags
+
+- You're iterating step 2 without a state filter — that returns
+  everything, including `Done`.
+- You skipped the claim PATCH and started editing code. Tracker still
+  shows `Todo` to other workers.
+- Two workspaces exist for two different issues but you're editing in
+  the wrong one. Re-check `pwd`.
+- You opened a PR but forgot to transition the issue out of
+  `In Progress`.
+- The poll loop has been running for >10 iterations without claiming
+  anything — the filter is wrong, or there's truly nothing to do (exit).
+
+
 ## Common Rationalizations
 
 | Rationalization | Reality |

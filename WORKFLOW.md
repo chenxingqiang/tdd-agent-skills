@@ -18,18 +18,18 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 tracker:
-  # SPEC §5.3.1 — currently the only supported value is "linear".
-  kind: linear
-  # Default Linear endpoint; override only for self-hosted proxies.
-  endpoint: https://api.linear.app/graphql
+  # Supported values: "linear", "supabase", "memory".
+  # ── Linear ─────────────────────────────────────────────────────────
+  # kind: linear
+  # endpoint: https://api.linear.app/graphql
+  # api_key: $LINEAR_API_KEY
+  # project_slug: REPLACE_WITH_YOUR_LINEAR_PROJECT_SLUG
+  # ── Supabase (local PostgreSQL via PostgREST, zero new deps) ──────
+  kind: supabase
+  endpoint: https://YOUR_PROJECT.supabase.co
+  api_key: $SUPABASE_SERVICE_ROLE_KEY
+  # ── Common ─────────────────────────────────────────────────────────
   # `$VAR_NAME` indirection — the literal token MUST NOT be checked in.
-  api_key: $LINEAR_API_KEY
-  # REQUIRED when kind == linear. Replace with your Linear project slug,
-  # which is the URL segment after "/project/" in Linear's project page
-  # (e.g. for `linear.app/your-team/project/api-platform-d8ac9c6f0a3b`
-  # the slug is `api-platform-d8ac9c6f0a3b`). Symphony filters dispatch
-  # by `project: { slugId: { eq: $projectSlug } }` (SPEC §11.2).
-  project_slug: REPLACE_WITH_YOUR_LINEAR_PROJECT_SLUG
   active_states:
     - Todo
     - In Progress
@@ -226,6 +226,68 @@ Symphony does **not** write to the tracker. You must:
 - Emit progress every few minutes at minimum. Symphony's stall detector
   (`codex.stall_timeout_ms = 5m`) will kill silent sessions.
 - Long-running commands should stream output, not buffer.
+
+## 4.6 Autonomous TDD loop via `tdd-cli`
+
+When this repo's Supabase tracker is wired up (migrations under
+`supabase/migrations/`), **all** state-changing actions must go through
+`bin/tdd-cli`. Bare `git commit`, manual `INSERT INTO commits …`, or
+mutations to `tasks`/`pull_requests` outside the CLI are forbidden — they
+bypass the TDD enforcement triggers and are considered a Universal Rule
+violation.
+
+The CLI exposes one command per allowed transition. The database's
+`work_queue` view tells you which one is legal **right now**:
+
+| `work_queue.next_action` (issue-level) | CLI command(s) |
+|---|---|
+| `WRITE_ACCEPTANCE_TEST` | author the e2e test → `tdd-cli set-acceptance` |
+| `WRITE_SPEC` | author spec → `git add` → `tdd-cli spec` |
+| `RUN_ACCEPTANCE_EXPECT_RED` | `tdd-cli test --scope acceptance` |
+| `DECOMPOSE_INTO_TASKS` | `tdd-cli add-task` (one per task) |
+| `WORK_NEXT_TASK` | dispatch on `focus_task_action` (see below) |
+| `DEBUG_ACCEPTANCE_GAP` | add a missing task or revisit spec; never edit acceptance to lie |
+| `COMPLETE_CHECKLIST` | `tdd-cli check --item KEY --pass --evidence …` |
+| `OPEN_PR` | `tdd-cli open-pr` |
+| `AWAIT_OR_REQUEST_REVIEW` | `tdd-cli review --verdict …` |
+| `MERGE_PR` | `tdd-cli merge --pr N` (rejected if any gate is red) |
+| `BLOCKED` | leave the issue, write a `decisions` row, hand off |
+
+| `focus_task_action` (task-level) | CLI command |
+|---|---|
+| `WRITE_RED_TEST` | author failing test → `git add` → `tdd-cli red` |
+| `MAKE_GREEN`     | author implementation → `git add` → `tdd-cli green` |
+| `CONSIDER_REFACTOR` | optional refactor → `git add` → `tdd-cli refactor`, or skip to next task |
+| `TASK_DONE` / `NOOP` | move on |
+
+The agent's main loop is therefore:
+
+```
+loop:
+  row = `tdd-cli queue` first row     # or `tdd-cli step --plan`
+  if no row: stop (all issues handled)
+  declare phase tag    # DESIGN / DEVELOPMENT / TESTING / VERIFICATION
+  call the CLI command implied by row.next_action / row.focus_task_action
+  if CLI exits non-zero with a TDD violation: re-enter DESIGN, do not retry blindly
+  log the turn:  `tdd-cli turn-log --session $SID --phase ... --action ... --prompt ...`
+```
+
+Three invariants the agent must respect:
+
+1. **Phase tag matches the action.** `WRITE_RED_TEST` → `[DEVELOPMENT]`,
+   `tdd-cli test --scope full_suite` → `[TESTING]`, etc. Mismatch is a
+   self-detected violation; abort the turn.
+2. **Never `git commit` directly.** All commits flow through `spec`, `red`,
+   `green`, `refactor`, or (rarely) the runtime's own merge commit during
+   `tdd-cli merge`. CI/docs-only commits use `tdd-cli` future `chore` (TBD)
+   — until that exists, escalate to human.
+3. **Read before write.** Every turn begins with `tdd-cli queue` and
+   `tdd-cli status`. The DB is the single source of truth for what comes
+   next; do not infer state from the filesystem alone.
+
+If the CLI raises a TDD-violation error, treat it as a **gift**: the
+violation message names the rule, which is also the next thing to fix.
+Record the violation in `decisions` and re-plan from `[DESIGN]`.
 
 ## 5. Production-Readiness Gate
 

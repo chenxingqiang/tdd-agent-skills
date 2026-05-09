@@ -25,10 +25,15 @@ repo-owned `WORKFLOW.md`.
 1. Loads the `symphony-orchestration` skill, which maps SPEC §1–§15 onto
    the four-phase TDD protocol (DESIGN → DEVELOPMENT → TESTING →
    VERIFICATION).
-2. Walks the user through one of three branches:
+2. Walks the user through one of four branches:
    - **Run mode** — you are inside a workspace; declare the phase tag,
      read the issue, walk the lifecycle (DEFINE → PLAN → BUILD → VERIFY →
      REVIEW → SHIP), and respect the seven Symphony surfaces.
+   - **Driver mode** — Claude Code itself plays the orchestrator: poll the
+     tracker, claim the next active issue, create/reuse a per-issue
+     workspace, walk the four phases, transition state on handoff, then
+     loop. Serial, no Elixir runtime needed. See "Driver Mode" in the
+     skill.
    - **Author mode** — generate or update `WORKFLOW.md` at the repo root
      using the canonical template. Validate front matter (YAML map with
      `tracker`, `polling`, `workspace`, `hooks`, `agent`, `codex`) and

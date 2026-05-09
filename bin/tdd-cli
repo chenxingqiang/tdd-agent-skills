@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Thin shim — keeps tdd-cli on PATH without packaging fuss.
+exec python3 "$(dirname "$0")/../tools/tdd_cli/tdd_cli.py" "$@"

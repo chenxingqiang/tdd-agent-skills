@@ -512,6 +512,13 @@ This separation ensures the test is written without knowledge of the fix, making
 
 For detailed testing patterns, examples, and anti-patterns across frameworks, see `references/testing-patterns.md`.
 
+When this repo ships `bin/tdd-cli` (Postgres-trigger-enforced TDD), use
+`tdd-cli red` / `tdd-cli green` / `tdd-cli refactor` instead of raw
+`git commit` for phase boundaries. The triggers reject out-of-order
+transitions (e.g., GREEN before RED, code edits during TESTING), turning
+this protocol into a hard gate rather than a convention. See
+`symphony-orchestration` Driver mode for the full loop.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
